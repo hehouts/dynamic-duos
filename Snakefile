@@ -1,6 +1,7 @@
 input_data = "vir_SAMPLEIDs.txt"
 samples= [x.strip().split(".tar")[0] for x in open(input_data, 'r')]
-print(samples)
+#takes first 5 samples
+samples=samples[:5]
 
 rule all:
     input: expand("raw_data/zipped_data/{sample}_{ext}.bz2", sample =samples, ext = [1,2])
