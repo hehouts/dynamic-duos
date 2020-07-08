@@ -13,11 +13,11 @@ rule all:
     input: 
         # uncompress_genome
         #expand("raw_data/zipped_data/{sample}_{ext}.bz2", sample =samples, ext = [1,2])
-       # expand("raw_data/zipped_data/{sample}_1_sequence.txt.bz2", sample =samples),
+        #expand("raw_data/zipped_data/{sample}_1_sequence.txt.bz2", sample =samples),
         #expand("raw_data/zipped_data/{sample}_2_sequence.txt.bz2", sample =samples),
-        expand("fastp/{sample}_1.trimmed.gz", sample=samples),
-        expand("fastp/{sample}_2.trimmed.gz", sample=samples)
-
+        #expand("fastp/{sample}_1.trimmed.gz", sample=samples),
+        #expand("fastp/{sample}_2.trimmed.gz", sample=samples),
+        expand("sourmash/sig/{sample}.sig", sample=samples)
 rule download_data:
     output: "raw_data/zipped_data/{sample}.tar"
     params: URL= lambda wildcards: "https://ibdmdb.org/tunnel/static/HMP2/Viromics/1732/" + wildcards.sample + ".tar"
@@ -66,6 +66,19 @@ rule fastp:
         -h {output.html} -j {output.json} > {log}
         """
 
+rule sourmash_compute:
+    input:
+        R1="fastp/{sample}_1.trimmed.gz",
+        R2="fastp/{sample}_2.trimmed.gz",
+    output:
+        "sourmash/sig/{sample}.sig"
+    log:
+        "logs/sourmash/sig/{sample}_sig.log"
+    benchmark:
+        "logs/sourmash/sig/{sample}_sig.benchmark"
+    shell:"""
+        sourmash compute -k 21,31,51 --scaled 500 --merge {wildcards.sample} --track-abundance -o {output} {input.R1} {input.R2}
+    """
 
 
 
