@@ -1,0 +1,8 @@
+name: virHMP_env
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - fastp=0.20.1
+  - sourmash=3.3.1
