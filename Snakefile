@@ -6,8 +6,8 @@ samples= [x.strip().split(".tar")[0] for x in open(input_data, 'r')]
 
 k_sizes= ["21","31","51"]
 
-#  #takes first 5 samples
-#  samples=samples[:5]
+  #takes first 5 sample
+samples=samples[:5]
 
 #print(samples)
 
