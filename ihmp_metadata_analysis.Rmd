@@ -1,0 +1,137 @@
+---
+title: "iHMP_metadata_analysis"
+output: html_document
+---
+
+
+Load libraries
+```{r, echo=FALSE}
+library(readr)
+library(dplyr)
+library(stringr)
+```
+
+Load data
+```{r}
+metadata <- readr::read_csv("hmp2_metadata.csv")
+```
+
+examine data
+```{r}
+barplot(table(metadata$data_type))
+colnames(metadata)
+table(metadata$data_type)
+
+```
+
+isolate viral data
+```{r}
+viral_metadata <- filter(metadata, data_type=="viromics")
+```
+
+```{r, results=FALSE}
+# string searches didnt help id specific antibiotic bc the phrase "antibiotic" is not present in the table, just the whole names of the antibiotic. but it did help id relevant columns
+
+str_detect(string = colnames(viral_metadata), pattern = "ntibiot")
+colnames(viral_metadata)[str_detect(string = colnames(viral_metadata), pattern = "ntibiot")]
+
+```
+
+
+make a table of only relevant columns: sample ID, partp ID, week_num, and drug info. Arrange by participant and week, also
+```{r}
+drug_metadata_viral <- viral_metadata%>%
+  select(`External ID`, `Participant ID`, week_num, Antibiotics, 317:385) %>%
+  arrange(`Participant ID`, week_num)
+```
+
+
+make a table of only relevant columns: sample ID, partp ID, week_num, and drug info. Arrange by participant and week, also
+```{r}
+drug_metadata_viral <- viral_metadata%>%
+  select(`External ID`, `Participant ID`, week_num, Antibiotics, 317:385) %>%
+  arrange(`Participant ID`, week_num)
+
+#examine an example row, 693:
+drug_metadata_viral[693,]
+```
+
+so we can see that this participant had antibiotics, but it doesnt show up in the drug columns, so I am going to investigate that participant outside of the viral metadata set...
+
+```{r}
+drug_metadata <- metadata%>%
+  select(`External ID`, `Participant ID`, `data_type`, `ProjectSpecificID`, week_num, Antibiotics, 317:385) %>%
+  arrange(`Participant ID`, week_num) %>%
+  filter(`Participant ID` == "P6037")
+```
+
+
+List of useful participant IDs, bc they 1) have viromics data, and they 2) have some abx treatment
+```{r}
+useful_ppl_metadata <- metadata%>%
+    select(`External ID`, `Participant ID`, data_type, week_num, Antibiotics)%>%
+    arrange(`Participant ID`, week_num) %>%
+    filter(`Antibiotics` == "Yes", data_type == "viromics")
+```
+```{r}
+useful_ppl_metadata <- metadata%>%
+    arrange(`Participant ID`, week_num) %>%
+    filter(`Antibiotics` == "Yes", data_type == "viromics")%>%
+    select(`Participant ID`)
+```
+
+
+# This is the list of participants we can use for the study!!
+
+```{r}
+useful_pIDs_metadata <- metadata%>%
+    arrange(`Participant ID`, week_num) %>%
+    filter(`Antibiotics` == "Yes", data_type == "viromics")%>%
+    select(`Participant ID`) %>%
+    distinct(`Participant ID`)
+```
+
+
+# So now lets get that sample numbers, in a list
+
+```{r}
+partip_IDs <- useful_pIDs_metadata[,1]
+```
+
+
+
+It is clear that this participant had abx for a few weeks, and has viromics data. 
+
+So lets filter for any participant that had abx, but also had viromics data.
+
+I need to filter for any participant in `metadata` that had antibiotics, then I need to filter `viral_metadata` for participants that match the list of IDs
+
+```{r}
+drug_metadata <- metadata%>%
+  select(`External ID`, `Participant ID`, `data_type`, `ProjectSpecificID`, week_num, Antibiotics, 317:385) %>%
+  arrange(`Participant ID`, week_num) %>%
+  filter(`Participant ID` == "P6037")
+```
+
+### Next Step
+Take the Rows included in viral metadata, collect those participant IDs
+
+```{r}
+#partp_w_virome <- viral_metadata%>%
+#  rename(viral_metadata$`Participant ID`, `Participant_ID`)%>%
+#  distinct(`Participant_ID`, .keep_all = FALSE)
+ 
+#partp_w_virome <- rename(partp_w_virome$`viral_metadata$`Participant ID``, `Participant ID`)
+  
+```
+
+
+```{r}
+tmp4 <- metadata %>%
+    filter(`Participant ID` == "C3008")
+```
+
+```{r}
+filter(metadata, metadata$`Participant ID` %in% partp_w_virome)
+
+```
