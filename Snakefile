@@ -33,17 +33,35 @@ rule all:
             #or
         #expand("fastp/{sample}_1.trimmed.gz", sample=samples),
         #expand("fastp/{sample}_2.trimmed.gz", sample=samples),
+        
+            #rule remove_host (bbduk)
+            # !!!!! (requires precise resources to run: --mem=64G -n 4 )
+        #expand("bbduk/{sample}_{ext}.nohost.fq.gz", sample=samples,ext = [1,2])
+        #expand("bbduk/{sample}_{ext}.human.fq.gz", sample=samples,ext = [1,2]) 
+            
 
+            #rule khmer
+        #expand("kmer/{sample}.kmertrim.fq.gz", sample=samples)
 
-        expand("sourmash/sig/{sample}.sig", sample=samples),
+            #rule sourmash_sketch (formerly sourmash_compute) 
+        #expand("sourmash/sig/{sample}.sig", sample=samples),
         #expand("sourmash/compare/virHMP_compare_k{ksize}_unfiltered.csv", ksize=k_sizes),
         #expand("sourmash/gather/{sample}_gather.csv",sample=samples)
-        #expand("kmer/{sample}.kmertrim.fq.gz", sample=samples)
         #expand("sourmash/plots/virHMP_compare_k{ksize}_unfiltered.numpy.dendro.pdf", ksize=k_sizes),
         #expand("sourmash/plots/virHMP_compare_k{ksize}_unfiltered.numpy.hist.pdf", ksize=k_sizes),
         #expand("sourmash/plots/virHMP_compare_k{ksize}_unfiltered.numpy.matrix.pdf", ksize=k_sizes)
 
         expand("{sample}_gather_unassigned.sig", sample= samples),
+
+
+
+
+        #expand("", sample=samples,ext = [1,2])
+        #expand("", sample=samples,ext = [1,2])
+        #expand("", sample=samples,ext = [1,2])
+
+
+
 
 rule download_data:
     output: "raw_data/zipped_data/{sample}.tar"
