@@ -13,20 +13,37 @@ samples=samples[:5]
 
 rule all:
     input: 
-        # uncompress_genome
-        #expand("raw_data/zipped_data/{sample}_{ext}.bz2", sample =samples, ext = [1,2])
-        #expand("raw_data/zipped_data/{sample}_1_sequence.txt.bz2", sample =samples),
-        #expand("raw_data/zipped_data/{sample}_2_sequence.txt.bz2", sample =samples),
+            #rule download_data
+        #expand("raw_data/zipped_data/{sample}.tar", sample = samples)
+ 
+           #rule uncompress_genome
+        #expand("raw_data/zipped_data/{sample}_{ext}.bz2", sample = samples, ext = [1,2])
+            #alt rule uncompress_genome
+        #expand("raw_data/zipped_data/{sample}_1_sequence.txt.bz2", sample = samples),
+        #expand("raw_data/zipped_data/{sample}_2_sequence.txt.bz2", sample = samples),
+
+            #rule bzip_to_gzip
+        #expand("raw_data/zipped_data/{sample}_{ext}.gz", sample = samples, ext = [1,2])
+            #alt rule bzip_to_gzip
+        #F1="raw_data/zipped_data/{sample}_1.gz", sample = samples),
+        #F2="raw_data/zipped_data/{sample}_2.gz" sample = samples),
+        
+            #rule fastp
+        #expand("fastp/{sample}_{ext}.trimmed.gz", sample=samples, ext = [1,2])
+            #or
         #expand("fastp/{sample}_1.trimmed.gz", sample=samples),
         #expand("fastp/{sample}_2.trimmed.gz", sample=samples),
-        #expand("sourmash/sig/{sample}.sig", sample=samples),
+
+
+        expand("sourmash/sig/{sample}.sig", sample=samples),
         #expand("sourmash/compare/virHMP_compare_k{ksize}_unfiltered.csv", ksize=k_sizes),
         #expand("sourmash/gather/{sample}_gather.csv",sample=samples)
         #expand("kmer/{sample}.kmertrim.fq.gz", sample=samples)
         #expand("sourmash/plots/virHMP_compare_k{ksize}_unfiltered.numpy.dendro.pdf", ksize=k_sizes),
         #expand("sourmash/plots/virHMP_compare_k{ksize}_unfiltered.numpy.hist.pdf", ksize=k_sizes),
         #expand("sourmash/plots/virHMP_compare_k{ksize}_unfiltered.numpy.matrix.pdf", ksize=k_sizes)
-        expand("sourmash/gather/{sample}_gather.csv", sample = samples)
+
+        expand("{sample}_gather_unassigned.sig", sample= samples),
 
 rule download_data:
     output: "raw_data/zipped_data/{sample}.tar"
@@ -133,6 +150,10 @@ rule sourmash_compute:
         sourmash compute -k {params.ksizes} --scaled 500 --merge {wildcards.sample} --track-abundance -o {output} {input}
     """
 
+#rule sourmash_sketch_protein:
+
+
+
 rule sourmash_compare:
     input: expand("sourmash/sig/{sample}.sig", sample=samples)
     output:
@@ -187,3 +208,9 @@ rule sourmash_gather:
         """
         sourmash gather {input.query} {input.database} -k 31 --threshold-bp=0 --scaled 2000 --save-matches {output.matches} --output-unassigned {output.unassigned} -o {output.csv} >& {output.report} 2> {log}
         """
+
+#rule sourmash_gather_pigeon_unassigned:
+    # same as sourmash_gather, but new database, and use prev smgather "unassigned" output as query
+
+#rule sourmash_gather_pigeon_unfiltered:
+    # same as sourmash_gather, but new database
