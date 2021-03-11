@@ -1,23 +1,29 @@
 
-
+    #GENERATE SAMPLE LIST
 input_data = "vir_SAMPLEIDs.txt"
-
 samples= [x.strip().split(".tar")[0] for x in open(input_data, 'r')]
 
+    #K SIZES
 k_sizes= ["21","31","51"]
+    ###more realistic for prot:    
+PROT_K_SIZES= ["5","7","10"]
 
-  #takes first 5 sample
+    #SUBSAMPLE
+    ###takes first 5 sample
 samples=samples[:5]
+    ###['SM-76C9Y', 'SM-9SIJC', 'SM-7M8RR', 'SM-7CP39', 'SM-9QMNE']
+    ###[ empty,      empty,      empty,      empty,      empty,   ]
 
-#print(samples)
+    #DEBUG PRINT
+print(samples)
 
 rule all:
     input: 
             #rule download_data
         #expand("raw_data/zipped_data/{sample}.tar", sample = samples)
- 
-           #rule uncompress_genome
-        #expand("raw_data/zipped_data/{sample}_{ext}.bz2", sample = samples, ext = [1,2])
+#
+            #rule uncompress_genome
+        expand("raw_data/zipped_data/{sample}_{ext}_sequence.txt.bz2", sample = samples, ext = ["1","2"])
             #alt rule uncompress_genome
         #expand("raw_data/zipped_data/{sample}_1_sequence.txt.bz2", sample = samples),
         #expand("raw_data/zipped_data/{sample}_2_sequence.txt.bz2", sample = samples),
@@ -27,42 +33,40 @@ rule all:
             #alt rule bzip_to_gzip
         #F1="raw_data/zipped_data/{sample}_1.gz", sample = samples),
         #F2="raw_data/zipped_data/{sample}_2.gz" sample = samples),
-        
+
             #rule fastp
         #expand("fastp/{sample}_{ext}.trimmed.gz", sample=samples, ext = [1,2])
             #or
         #expand("fastp/{sample}_1.trimmed.gz", sample=samples),
         #expand("fastp/{sample}_2.trimmed.gz", sample=samples),
-        
+
             #rule remove_host (bbduk)
             # !!!!! (requires precise resources to run: --mem=64G -n 4 )
         #expand("bbduk/{sample}_{ext}.nohost.fq.gz", sample=samples,ext = [1,2])
         #expand("bbduk/{sample}_{ext}.human.fq.gz", sample=samples,ext = [1,2]) 
-            
 
             #rule khmer
         #expand("kmer/{sample}.kmertrim.fq.gz", sample=samples)
 
             #rule sourmash_sketch (formerly sourmash_compute) 
-        #expand("sourmash/sig/{sample}.sig", sample=samples),
+        #expand("sourmash/sig/{sample}_dna.sig", sample= samples)
+
+
+
+
+        #expand("sourmash/sig/{sample}_trn_prot.sig", sample=samples),
+        #expand("sourmash/sig/{sample}_prot.sig", sample=samples),
         #expand("sourmash/compare/virHMP_compare_k{ksize}_unfiltered.csv", ksize=k_sizes),
         #expand("sourmash/gather/{sample}_gather.csv",sample=samples)
         #expand("sourmash/plots/virHMP_compare_k{ksize}_unfiltered.numpy.dendro.pdf", ksize=k_sizes),
         #expand("sourmash/plots/virHMP_compare_k{ksize}_unfiltered.numpy.hist.pdf", ksize=k_sizes),
         #expand("sourmash/plots/virHMP_compare_k{ksize}_unfiltered.numpy.matrix.pdf", ksize=k_sizes)
-
-        expand("{sample}_gather_unassigned.sig", sample= samples),
-
-
-
-
-        #expand("", sample=samples,ext = [1,2])
-        #expand("", sample=samples,ext = [1,2])
-        #expand("", sample=samples,ext = [1,2])
+        #expand("{sample}_gather_unassigned.sig", sample= samples),
 
 
 
 
+#--------------------------------------------------------------------------
 rule download_data:
     output: "raw_data/zipped_data/{sample}.tar"
     params: URL= lambda wildcards: "https://ibdmdb.org/tunnel/static/HMP2/Viromics/1732/" + wildcards.sample + ".tar"
@@ -76,6 +80,8 @@ rule uncompress_genome:
         "raw_data/zipped_data/{sample}_2_sequence.txt.bz2" 
     shell:
         "tar xvf {input} -C raw_data/zipped_data/"
+
+
 rule bzip_to_gzip:
     input: 
         F1="raw_data/zipped_data/{sample}_1_sequence.txt.bz2",
@@ -99,6 +105,7 @@ rule bzip_to_gzip:
         bzcat {input.F2} | gzip -c -9 > {output.F2} 2>> {log}
         """
 
+
 rule fastp:
     input:
         R1="raw_data/zipped_data/{sample}_1.gz", 
@@ -120,6 +127,7 @@ rule fastp:
         -o {output.R1} -O {output.R2} \
         -h {output.html} -j {output.json} > {log}
         """
+
 
 rule remove_host:
     input:
@@ -150,12 +158,29 @@ rule khmer:
         """
 
 
-#### Sourmashy Stuff ####
+#---sourmash-sketch-----------------------------------------------------------------------
 
-rule sourmash_compute:
+#old rule sourmash_compute:
+#    input: "kmer/{sample}.kmertrim.fq.gz"
+#    output:
+#        "sourmash/sig/{sample}.sig"
+#    params:
+#        ksizes=",".join(k_sizes)
+#    log:
+#        "logs/sourmash/sig/{sample}_sig.log"
+#    benchmark:
+#        "logs/sourmash/sig/{sample}_sig.benchmark"
+#    conda:
+#        "virHMP_env.yml"
+#    shell:"""
+#        sourmash compute -k {params.ksizes} --scaled 500 --merge {wildcards.sample}\
+#            --track-abundance -o {output} {input}"""
+
+#DNA
+rule sourmash_sketch_dna:
     input: "kmer/{sample}.kmertrim.fq.gz"
     output:
-        "sourmash/sig/{sample}.sig"
+        "sourmash/sig/{sample}_dna.sig"
     params:
         ksizes=",".join(k_sizes)
     log:
@@ -164,12 +189,63 @@ rule sourmash_compute:
         "logs/sourmash/sig/{sample}_sig.benchmark"
     conda:
         "virHMP_env.yml"
+    #shell used to have "--merge {wildcards.sample}", but i dont remember what that does 
+    #so I just took it out?
     shell:"""
-        sourmash compute -k {params.ksizes} --scaled 500 --merge {wildcards.sample} --track-abundance -o {output} {input}
+        sourmash sketch dna \
+        -k {params.ksizes}\
+        --scaled 100\
+        --track-abundance\
+        -o {output}\
+        {input}
     """
 
-#rule sourmash_sketch_protein:
 
+rule sourmash_sketch_translate:
+    input: "kmer/{sample}.kmertrim.fq.gz"
+    output:
+        "sourmash/sig/{sample}_trns_prot.sig"
+    params:
+        ksizes=",".join(PROT_K_SIZES)
+    log:
+        "logs/sourmash/sig/{sample}_trns_prot_sig.log"
+    benchmark:
+        "logs/sourmash/sig/{sample}_trns_prot_sig.benchmark"
+    conda:
+        "virHMP_env.yml"
+    #shell used to have "--merge {wildcards.sample}", but i dont remember what that does 
+    #so I just took it out?
+    shell:"""
+        sourmash sketch translate \
+        -k {params.ksizes}\
+        --scaled 50\
+        --track-abundance\
+        -o {output}\
+        {input}
+    """
+#rule sourmash_sketch_protein:
+rule sourmash_sketch_prot:
+    input: "kmer/{sample}.kmertrim.fq.gz"
+    output:
+        "sourmash/sig/{sample}_trns_prot.sig"
+    params:
+        ksizes=",".join(PROT_K_SIZES)
+    log:
+        "logs/sourmash/sig/{sample}_trns_prot_sig.log"
+    benchmark:
+        "logs/sourmash/sig/{sample}_trns_prot_sig.benchmark"
+    conda:
+        "virHMP_env.yml"
+    #shell used to have "--merge {wildcards.sample}", but i dont remember what that does 
+    #so I just took it out?
+    shell:"""
+        sourmash sketch translate \
+        -k {params.ksizes}\
+        --scaled 50\
+        --track-abundance\
+        -o {output}\
+        {input}
+    """
 
 
 rule sourmash_compare:
