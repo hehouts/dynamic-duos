@@ -131,9 +131,21 @@ rule remove_host:
         human_R1 = "bbduk/{sample}_1.human.fq.gz",
         human_R2 = "bbduk/{sample}_2.human.fq.gz"
     #bbduk requires 64gb of mem, and requires "-n 4" in srun command
+    #^this didnt actually work, so I might need to req slightly more mem, ~65gb?
+    #but first trying out resources and threads directive
+    conda:
+        "Envs/bbduk_env.yml"
+    resources:
+        mem_mb=64000
+    threads:
+        4
+    log:
+        "logs/bbduk/{sample}_bbduk.log"
+    benchmark:
+        "logs/bbduk/{sample}_bbduk.benchmark"
     shell:
         """
-        bbduk.sh -Xmx64g t=4 in={input.R1} in2={input.R2} out={output.R1} out2={output.R2} outm={output.human_R1} outm2={output.human_R2} k=31 ref={input.human}
+        bbduk.sh -Xmx64g t={threads} in={input.R1} in2={input.R2} out={output.R1} out2={output.R2} outm={output.human_R1} outm2={output.human_R2} k=31 ref={input.human} > {log} 2>&1
         """
 
 
@@ -168,6 +180,14 @@ rule khmer:
 #            --track-abundance -o {output} {input}"""
 
 #DNA
+
+#some python for making the sm4.0 
+#from genome-grist:: make a `sourmash sketch` -p param string.
+def make_param_str(ksizes, scaled):
+    ks = [ f'k={k}' for k in ksizes ]
+    ks = ",".join(ks)
+    return f"{ks},scaled={scaled},abund"
+
 rule sourmash_sketch_dna:
     input: "kmer/{sample}.kmertrim.fq.gz"
     output:
