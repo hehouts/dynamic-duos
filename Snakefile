@@ -30,10 +30,10 @@ rule all:
 #        expand("raw_data/zipped_data/{sample}_{ext}.gz", sample = samples, ext = [1,2])
 #
 #   rule fastp
-       expand("fastp/{sample}_{ext}.trimmed.fq.gz", sample=samples, ext = [1,2])
+#       expand("fastp/{sample}_{ext}.trimmed.fq.gz", sample=samples, ext = [1,2])
 #   rule remove_host (bbduk)
 #   !!!!! (requires precise resources to run: --mem=64G -n 4 )
-#        expand("bbduk/{sample}_{ext}.nohost.fq.gz", sample = samples, ext = ["1","2"]),
+        expand("bbduk/{sample}_{ext}.{org}.fq.gz", sample = samples, ext = ["1","2"], org = ["nohost","human"]),
 #        expand("bbduk/{sample}_{ext}.human.fq.gz",  sample = samples, ext = ["1","2"]),
 #
 #   rule khmer
@@ -124,7 +124,7 @@ rule remove_host:
     input:
         R1 = "fastp/{sample}_1.trimmed.fq.gz",
         R2 = "fastp/{sample}_2.trimmed.fq.gz",
-        human = "databases/hg19_main_mask_ribo_animal_allplant_allfungus.fa.gz"
+        human = "../databases/hg19_main_mask_ribo_animal_allplant_allfungus.fa.gz"
     output:
         R1 = "bbduk/{sample}_1.nohost.fq.gz",
         R2 = "bbduk/{sample}_2.nohost.fq.gz",
