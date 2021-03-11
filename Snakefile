@@ -19,49 +19,40 @@ print(samples)
 
 rule all:
     input: 
-            #rule download_data
-        #expand("raw_data/zipped_data/{sample}.tar", sample = samples)
 #
-            #rule uncompress_genome
-        expand("raw_data/zipped_data/{sample}_{ext}_sequence.txt.bz2", sample = samples, ext = ["1","2"])
-            #alt rule uncompress_genome
-        #expand("raw_data/zipped_data/{sample}_1_sequence.txt.bz2", sample = samples),
-        #expand("raw_data/zipped_data/{sample}_2_sequence.txt.bz2", sample = samples),
-
-            #rule bzip_to_gzip
-        #expand("raw_data/zipped_data/{sample}_{ext}.gz", sample = samples, ext = [1,2])
-            #alt rule bzip_to_gzip
-        #F1="raw_data/zipped_data/{sample}_1.gz", sample = samples),
-        #F2="raw_data/zipped_data/{sample}_2.gz" sample = samples),
-
-            #rule fastp
-        #expand("fastp/{sample}_{ext}.trimmed.gz", sample=samples, ext = [1,2])
-            #or
-        #expand("fastp/{sample}_1.trimmed.gz", sample=samples),
-        #expand("fastp/{sample}_2.trimmed.gz", sample=samples),
-
-            #rule remove_host (bbduk)
-            # !!!!! (requires precise resources to run: --mem=64G -n 4 )
-        #expand("bbduk/{sample}_{ext}.nohost.fq.gz", sample=samples,ext = [1,2])
-        #expand("bbduk/{sample}_{ext}.human.fq.gz", sample=samples,ext = [1,2]) 
-
-            #rule khmer
-        #expand("kmer/{sample}.kmertrim.fq.gz", sample=samples)
-
-            #rule sourmash_sketch (formerly sourmash_compute) 
-        #expand("sourmash/sig/{sample}_dna.sig", sample= samples)
-
-
-
-
-        #expand("sourmash/sig/{sample}_trn_prot.sig", sample=samples),
-        #expand("sourmash/sig/{sample}_prot.sig", sample=samples),
-        #expand("sourmash/compare/virHMP_compare_k{ksize}_unfiltered.csv", ksize=k_sizes),
-        #expand("sourmash/gather/{sample}_gather.csv",sample=samples)
-        #expand("sourmash/plots/virHMP_compare_k{ksize}_unfiltered.numpy.dendro.pdf", ksize=k_sizes),
-        #expand("sourmash/plots/virHMP_compare_k{ksize}_unfiltered.numpy.hist.pdf", ksize=k_sizes),
-        #expand("sourmash/plots/virHMP_compare_k{ksize}_unfiltered.numpy.matrix.pdf", ksize=k_sizes)
-        #expand("{sample}_gather_unassigned.sig", sample= samples),
+#   rule download_data
+#        expand("raw_data/zipped_data/{sample}.tar", sample = samples)
+#
+#   rule uncompress_genome
+#        expand("raw_data/zipped_data/{sample}_{ext}_sequence.txt.bz2", sample = samples, ext = ["1","2"])
+#
+#   rule bzip_to_gzip
+#        expand("raw_data/zipped_data/{sample}_{ext}.gz", sample = samples, ext = [1,2])
+#
+#   rule fastp
+       expand("fastp/{sample}_{ext}.trimmed.fq.gz", sample=samples, ext = [1,2])
+#   rule remove_host (bbduk)
+#   !!!!! (requires precise resources to run: --mem=64G -n 4 )
+#        expand("bbduk/{sample}_{ext}.nohost.fq.gz", sample = samples, ext = ["1","2"]),
+#        expand("bbduk/{sample}_{ext}.human.fq.gz",  sample = samples, ext = ["1","2"]),
+#
+#   rule khmer
+#        expand("kmer/{sample}.kmertrim.fq.gz", sample=samples)
+#
+#   rule sourmash_sketch (formerly sourmash_compute) 
+#        expand("sourmash/sig/{sample}_dna.sig", sample= samples)
+#
+#
+#
+#
+#        #expand("sourmash/sig/{sample}_trn_prot.sig", sample=samples),
+#        #expand("sourmash/sig/{sample}_prot.sig", sample=samples),
+#        #expand("sourmash/compare/virHMP_compare_k{ksize}_unfiltered.csv", ksize=k_sizes),
+#        #expand("sourmash/gather/{sample}_gather.csv",sample=samples)
+#        #expand("sourmash/plots/virHMP_compare_k{ksize}_unfiltered.numpy.dendro.pdf", ksize=k_sizes),
+#        #expand("sourmash/plots/virHMP_compare_k{ksize}_unfiltered.numpy.hist.pdf", ksize=k_sizes),
+#        #expand("sourmash/plots/virHMP_compare_k{ksize}_unfiltered.numpy.matrix.pdf", ksize=k_sizes)
+#        #expand("{sample}_gather_unassigned.sig", sample= samples),
 
 
 
@@ -111,8 +102,8 @@ rule fastp:
         R1="raw_data/zipped_data/{sample}_1.gz", 
         R2="raw_data/zipped_data/{sample}_2.gz"
     output:
-        R1="fastp/{sample}_1.trimmed.gz", 
-        R2="fastp/{sample}_2.trimmed.gz",
+        R1="fastp/{sample}_1.trimmed.fq.gz", 
+        R2="fastp/{sample}_2.trimmed.fq.gz",
         html="fastp/{sample}_fastp.html",
         json="fastp/{sample}_fastp.json"
     log:
@@ -131,8 +122,8 @@ rule fastp:
 
 rule remove_host:
     input:
-        R1 = "fastp/{sample}_1.trim.fastq.gz",
-        R2 = "fastp/{sample}_2.trim.fastq.gz",
+        R1 = "fastp/{sample}_1.trimmed.fq.gz",
+        R2 = "fastp/{sample}_2.trimmed.fq.gz",
         human = "databases/hg19_main_mask_ribo_animal_allplant_allfungus.fa.gz"
     output:
         R1 = "bbduk/{sample}_1.nohost.fq.gz",
