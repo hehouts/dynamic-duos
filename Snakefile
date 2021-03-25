@@ -10,13 +10,17 @@ PROT_K_SIZES= ["5","7","10"]
 
     #SUBSAMPLE
     ###takes first 5 sample
-samples=samples[:5]
+#samples=samples[:5]
+samples=samples[:1]
     ###['SM-76C9Y', 'SM-9SIJC', 'SM-7M8RR', 'SM-7CP39', 'SM-9QMNE']
     ###[ empty,      empty,      empty,      empty,      empty,   ]
 
     #DEBUG PRINT
-print(samples)
+#   print(samples)
 
+
+
+#--------------------------------------------------------------------------
 rule all:
     input: 
 #
@@ -33,18 +37,17 @@ rule all:
 #       expand("fastp/{sample}_{ext}.trimmed.fq.gz", sample=samples, ext = [1,2])
 #   rule remove_host (bbduk)
 #   !!!!! (requires precise resources to run: --mem=64G -n 4 )
-        expand("bbduk/{sample}_{ext}.{org}.fq.gz", sample = samples, ext = ["1","2"], org = ["nohost","human"]),
-#        expand("bbduk/{sample}_{ext}.human.fq.gz",  sample = samples, ext = ["1","2"]),
+#        expand("bbduk/{sample}_{ext}.{org}.fq.gz", sample = samples, ext = ["1","2"], org = ["nohost","human"]),
 #
 #   rule khmer
 #        expand("kmer/{sample}.kmertrim.fq.gz", sample=samples)
 #
 #   rule sourmash_sketch (formerly sourmash_compute) 
-#        expand("sourmash/sig/{sample}_dna.sig", sample= samples)
+        expand("sourmash/sig/{sample}_dna.sig", sample= samples)
 #
 #
 #
-#
+# these might be useful later:
 #        #expand("sourmash/sig/{sample}_trn_prot.sig", sample=samples),
 #        #expand("sourmash/sig/{sample}_prot.sig", sample=samples),
 #        #expand("sourmash/compare/virHMP_compare_k{ksize}_unfiltered.csv", ksize=k_sizes),
@@ -55,9 +58,9 @@ rule all:
 #        #expand("{sample}_gather_unassigned.sig", sample= samples),
 
 
-
-
 #--------------------------------------------------------------------------
+
+
 rule download_data:
     output: "raw_data/zipped_data/{sample}.tar"
     params: URL= lambda wildcards: "https://ibdmdb.org/tunnel/static/HMP2/Viromics/1732/" + wildcards.sample + ".tar"
@@ -145,7 +148,12 @@ rule remove_host:
         "logs/bbduk/{sample}_bbduk.benchmark"
     shell:
         """
-        bbduk.sh -Xmx64g t={threads} in={input.R1} in2={input.R2} out={output.R1} out2={output.R2} outm={output.human_R1} outm2={output.human_R2} k=31 ref={input.human} > {log} 2>&1
+        bbduk.sh -Xmx64g t={threads}\
+        in={input.R1} in2={input.R2}\
+        out={output.R1} out2={output.R2}\
+        outm={output.human_R1} outm2={output.human_R2}\
+        k=31 ref={input.human}\
+        > {log} 2>&1
         """
 
 
@@ -153,11 +161,18 @@ rule khmer:
     input:
         R1="fastp/{sample}_1.trimmed.gz",
         R2="fastp/{sample}_2.trimmed.gz"
-    output:"kmer/{sample}.kmertrim.fq.gz"
+    output:
+        "kmer/{sample}.kmertrim.fq.gz"
+    conda:
+        "Envs/khmer_env.yml"
+    log:
+        "logs/khmer/{sample}_khmer.log"
     shell:
         """
         interleave-reads.py {input.R1} {input.R2} | \
-        trim-low-abund.py --gzip -C 3 -Z 18 -M 20e9 -V - -o {output}
+        trim-low-abund.py --gzip -C 3 -Z 18 -M 20e9 -V \
+        - -o {output}\
+        > {log} 2>&1
         """
 
 
@@ -186,8 +201,9 @@ rule khmer:
 def make_param_str(ksizes, scaled):
     ks = [ f'k={k}' for k in ksizes ]
     ks = ",".join(ks)
+    print(ks)
     return f"{ks},scaled={scaled},abund"
-
+    
 rule sourmash_sketch_dna:
     input: "kmer/{sample}.kmertrim.fq.gz"
     output:
@@ -199,7 +215,7 @@ rule sourmash_sketch_dna:
     benchmark:
         "logs/sourmash/sig/{sample}_sig.benchmark"
     conda:
-        "virHMP_env.yml"
+        "Envs/sourmash_env.yml"
     #shell used to have "--merge {wildcards.sample}", but i dont remember what that does 
     #so I just took it out?
     shell:"""
