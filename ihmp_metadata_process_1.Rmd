@@ -1,12 +1,12 @@
 ---
-title: "iHMP_metadata_analysis_2"
+title: "iHMP_metadata_analysis_1"
 output: html_document
 ---
 
 ### Setup
 
 ```{r setwd, include=FALSE}
-#setwd("R/2020-IBD-Virome/")
+#setwd("/Users/hehouts/Projects/2020-IBD-Virome")
 ```
 
 ```{r trunc-output, include=FALSE}
@@ -37,7 +37,7 @@ library(stringr)
 
 Load Data
 ```{r load-data, message=FALSE, warning=FALSE}
-og_metadata <- readr::read_csv("hmp2_metadata.csv")
+og_metadata <- readr::read_csv("ihmp_metadata.csv")
 ```
 
 ### Explore metadata
@@ -138,12 +138,41 @@ print(participants)
 ```
 
 
-# So now lets get that sample numbers, in a list
-
-```{r}
-participants_ids_list <- participants[,1]
-print(typeof(participants))
+### So now lets get that sample numbers, in a list
+```{}
+C3002
+C3003
+C3008
+C3010
+C3016
+C3017
+C3027
+C3031
+C3034
+C3037
+E5009
+H4006
+H4013
+H4015
+H4016
+H4017
+H4018
+H4024
+H4030
+H4035
+H4038
+H4039
+M2025
+M2028
+M2064
+M2068
+M2069
+M2077
+P6010
+P6016
+P6018
+P6024
+P6028
+P6037
 ```
-
-
 
