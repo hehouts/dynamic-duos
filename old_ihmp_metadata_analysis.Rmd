@@ -73,8 +73,10 @@ useful_ppl_metadata <- metadata%>%
     arrange(`Participant ID`, week_num) %>%
     filter(`Antibiotics` == "Yes", data_type == "viromics")
 ```
+
+ONLY a list of relevant IDs
 ```{r}
-useful_ppl_metadata <- metadata%>%
+useful_ppl_prt_IDs_metadata <- metadata%>%
     arrange(`Participant ID`, week_num) %>%
     filter(`Antibiotics` == "Yes", data_type == "viromics")%>%
     select(`Participant ID`)
@@ -91,12 +93,6 @@ useful_pIDs_metadata <- metadata%>%
     distinct(`Participant ID`)
 ```
 
-
-# So now lets get that sample numbers, in a list
-
-```{r}
-partip_IDs <- useful_pIDs_metadata[,1]
-```
 
 
 
@@ -115,6 +111,26 @@ drug_metadata <- metadata%>%
 
 ### Next Step
 Take the Rows included in viral metadata, collect those participant IDs
+
+
+```{r}
+useful_samples <- metadata%>%
+    select(`External ID`, `Participant ID`, data_type, week_num, Antibiotics)%>%
+    arrange(`Participant ID`, week_num) %>%
+    filter(`Antibiotics` == "Yes", `data_type` == "metagenomics")
+
+#useful_samples <- subset(`Participant ID` %in% partip_IDs)
+```
+
+
+
+
+
+
+
+
+
+
 
 ```{r}
 #partp_w_virome <- viral_metadata%>%
