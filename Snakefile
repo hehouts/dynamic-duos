@@ -188,15 +188,16 @@ rule khmer:
 #        "logs/sourmash/sig/{sample}_sig.log"
 #    benchmark:
 #        "logs/sourmash/sig/{sample}_sig.benchmark"
-#    conda:
+#    conda
 #        "virHMP_env.yml"
 #    shell:"""
 #        sourmash compute -k {params.ksizes} --scaled 500 --merge {wildcards.sample}\
 #            --track-abundance -o {output} {input}"""
 
-#DNA
 
-#some python for making the sm4.0 
+
+#DNA
+#some python for making "-p" entry for sourmash 4.0 
 #from genome-grist:: make a `sourmash sketch` -p param string.
 def make_param_str(ksizes, scaled):
     ks = [ f'k={k}' for k in ksizes ]
@@ -209,48 +210,74 @@ rule sourmash_sketch_dna:
     output:
         "sourmash/sig/{sample}_dna.sig"
     params:
-        ksizes=",".join(k_sizes)
+        smash_params= make_param_str(k_sizes, 100)
     log:
         "logs/sourmash/sig/{sample}_sig.log"
     benchmark:
         "logs/sourmash/sig/{sample}_sig.benchmark"
     conda:
         "Envs/sourmash_env.yml"
-    #shell used to have "--merge {wildcards.sample}", but i dont remember what that does 
-    #so I just took it out?
     shell:"""
         sourmash sketch dna \
-        -k {params.ksizes}\
-        --scaled 100\
-        --track-abundance\
-        -o {output}\
-        {input}
+        -p {params.smash_params} \
+        --name {wildcards.sample} \
+        -o {output} \
+        {input} \
+        > {log} 2>&1
     """
 
+
+#rule sourmash_sketch_translate:
+#    input: "kmer/{sample}.kmertrim.fq.gz"
+#    output:
+#        "sourmash/sig/{sample}_trns_prot.sig"
+#    params:
+#        ksizes=",".join(PROT_K_SIZES)
+#    log:
+#        "logs/sourmash/sig/{sample}_trns_prot_sig.log"
+#    benchmark:
+#        "logs/sourmash/sig/{sample}_trns_prot_sig.benchmark"
+#    conda:
+#        "virHMP_env.yml"
+#    #shell used to have "--merge {wildcards.sample}", but i dont remember what that does 
+#    #so I just took it out?
+#    shell:"""
+#        sourmash sketch translate \
+#        -k {params.ksizes}\
+#        --scaled 50\
+#        --track-abundance\
+#        -o {output}\
+#        {input}
+#    """
 
 rule sourmash_sketch_translate:
     input: "kmer/{sample}.kmertrim.fq.gz"
     output:
         "sourmash/sig/{sample}_trns_prot.sig"
     params:
-        ksizes=",".join(PROT_K_SIZES)
+        smash_params= make_param_str(k_sizes, 100)
     log:
-        "logs/sourmash/sig/{sample}_trns_prot_sig.log"
+        "logs/sourmash/sig/{sample}_sig.log"
     benchmark:
-        "logs/sourmash/sig/{sample}_trns_prot_sig.benchmark"
+        "logs/sourmash/sig/{sample}_sig.benchmark"
     conda:
-        "virHMP_env.yml"
-    #shell used to have "--merge {wildcards.sample}", but i dont remember what that does 
-    #so I just took it out?
+        "Envs/sourmash_env.yml"
     shell:"""
-        sourmash sketch translate \
-        -k {params.ksizes}\
-        --scaled 50\
-        --track-abundance\
-        -o {output}\
-        {input}
+        sourmash sketch dna \
+        -p {params.smash_params} \
+        --name {wildcards.sample} \
+        -o {output} \
+        {input} \
+        > {log} 2>&1
     """
+
+
+
 #rule sourmash_sketch_protein:
+
+
+
+
 rule sourmash_sketch_prot:
     input: "kmer/{sample}.kmertrim.fq.gz"
     output:
