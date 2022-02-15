@@ -3,8 +3,8 @@ library(dplyr)
 library(stringr)
 
 
-#Load data
-metadata <- readr::read_csv("R/2020-IBD-Virome/hmp2_metadata.csv")
+metadata <- readr::read_csv("R/VirHMP/hmp2_metadata.csv")
+viral_metadata <- filter(metadata, !is.na(reads_viral)) 
 
 barplot(table(metadata$data_type))
 
@@ -19,11 +19,11 @@ colnames(viral_metadata)[str_detect(string = colnames(viral_metadata), pattern =
 tmp <- viral_metadata%>%
   select(`External ID`, `Participant ID`, week_num, colnames(viral_metadata)[str_detect(string = colnames(viral_metadata), pattern = "ntibiot")])
 
-tmp2 <- viral_metadata%>%
+tmp <- viral_metadata%>%
   select(`External ID`, `Participant ID`, week_num, Antibiotics, Lomotil, `Dipentum (olsalazine)`, `Cipro (Ciprofloxin)`)
 
 
-tmp3 <- metadata%>%
+tmp <- metadata%>%
   select(`External ID`, `Participant ID`, week_num, Antibiotics, Lomotil, `Dipentum (olsalazine)`, `Cipro (Ciprofloxin)`)
 
 
