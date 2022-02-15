@@ -1,0 +1,104 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+### Setup
+
+```{r setwd, include=FALSE}
+#setwd("/Users/hehouts/Projects/2020-IBD-Virome")
+```
+
+```{r trunc-output, include=FALSE}
+# save the built-in output hook
+hook_output <- knitr::knit_hooks$get("output")
+
+# set a new output hook to truncate text output
+knitr::knit_hooks$set(output = function(x, options) {
+  if (!is.null(n <- options$out.lines)) {
+    x <- xfun::split_lines(x)
+    if (length(x) > n) {
+      # truncate the output
+      x <- c(head(x, n), "....\n")
+    }
+    x <- paste(x, collapse = "\n")
+  }
+  hook_output(x, options)
+})
+```
+
+
+Load libraries
+```{r load-libs, message=FALSE, warning=FALSE}
+library(readr)
+library(dplyr)
+library(stringr)
+library(tidyverse)
+```
+
+Load Data
+```{r load-data, message=FALSE, warning=FALSE}
+og_metadata <- readr::read_csv("iHMP-manifests/ihmp_metadata.csv")
+```
+
+```{r exmn-virdata, out.lines=25}
+mgx_metadata <- og_metadata %>%
+    filter(data_type=="metagenomics") %>%
+    rename(research_project=`Research Project`) %>%
+    rename(participant_id=`Participant ID`) %>%
+    rename(external_id=`External ID`) %>%
+    rename(age_at_diagnosis=`Age at diagnosis`) %>%
+    filter(research_project=="ibdmdb")
+print(mgx_metadata)
+```
+
+
+```{r}
+subset_mgx <- mgx_metadata %>%
+  filter(participant_id == "C3002"
+        | participant_id == "C3003"
+        | participant_id == "C3008"
+        )%>%
+  arrange(participant_id, week_num)
+subset_mgx
+```
+
+
+
+
+```{r}
+c3002_mgx <- mgx_metadata %>%
+  filter(participant_id == "C3002"
+        )%>%
+  arrange(participant_id, week_num)%>%
+  select(external_id, week_num, participant_id)
+
+
+c3002_mgx
+```
+
+```{r}
+c3002_mgx %>% select(external_id)
+```
+
+
+
+```
+CSM5FZ3T_P.tar			
+CSM5FZ3X_P.tar			
+CSM5FZ3Z_P.tar			
+CSM5FZ42_P.tar			
+CSM5FZ44_P.tar			
+CSM5FZ46_P.tar			
+CSM5MCVJ_P.tar			
+CSM5MCVL.tar		
+CSM5MCVN.tar		
+CSM67UBF.tar
+
+```
