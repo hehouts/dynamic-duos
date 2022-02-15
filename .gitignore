@@ -3,4 +3,9 @@ raw_data/
 .RData
 .Rhistory
 2020-work/
+snakecrate/data/
+
+*.gz
+*.log
+*.benchmark
 
