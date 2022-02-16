@@ -1,6 +1,6 @@
 
     #GENERATE SAMPLE LIST
-input_data = "vir_SAMPLEIDs.txt"
+input_data = "sample_lists/vir_SAMPLEIDs.txt"
 samples= [x.strip().split(".tar")[0] for x in open(input_data, 'r')]
 
     #K SIZES
