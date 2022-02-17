@@ -1,0 +1,109 @@
+---
+title: "ibdmdb_dynduo_relevant_participants"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### libraries
+Load libraries
+```{r, echo=FALSE, warning=FALSE}
+library(tidyverse)
+library(janitor)
+```
+
+
+### load data 
+This .csv was pulled from the ibdmdb webpage?
+
+
+
+
+
+
+
+```{r}
+reference_metadata <- readr::read_csv("metadata/ibdmdb-metadata-manifests/ihmp_metadata.csv", show_col_types = F)
+#tidy names
+metadata <- clean_names(reference_metadata)
+
+#colnames(metadata)
+head(metadata, 10)
+```
+### isolate viromics & metagenomics data
+(expand to see all bar names)
+```{r}
+#   #baseR:
+#barplot(table(metadata$data_type))
+
+metadata %>%
+  ggplot(aes(x = data_type))+
+  geom_bar()+
+  coord_flip()
+```
+
+These are samples that are viromic-- they can be filtered by `data_type` or `reads_viral` --both yield the same result.
+```{r}
+#filter(metadata, data_type=="viromics") 
+##   yields 703
+#filter(metadata, !is.na(reads_viral))
+##   yields 703
+#filter(metadata, !is.na(reads_viral) & data_type=="viromics") 
+##   yields 703
+
+viral_metadata <- filter(metadata, data_type=="viromics")
+
+# lets grab metagenomics while we're here:
+mgx_metadata <- filter(metadata, data_type=="metagenomics")
+
+```
+
+### explore antibiotic data
+Very few columns contain antibiotics in the col name. This shows I cant actually filter with regex for the specific drugs.
+"antibiotics"
+"in_the_past_6_months_have_you_used_antibiotics"           
+"were_you_treated_with_antibiotics_before_the_age_of_one"
+"has_the_subject_used_any_antibiotics_since_the_last_visit"
+"other_antibiotic"
+"reason_for_stopping_other_antibiotic"   
+```{r}
+
+#   # T/F table:
+#str_detect(string = colnames(viral_metadata), pattern = "ntibiot")
+
+colnames(viral_metadata %>% select(contains("ntibiot")))
+#  select(str_detect(string = colnames(viral_metadata), pattern = "ntibiot"))
+```
+
+#### "antibiotic" phrase containing vectors:
+```
+"antibiotics"
+"in_the_past_6_months_have_you_used_antibiotics"           
+"were_you_treated_with_antibiotics_before_the_age_of_one"
+"has_the_subject_used_any_antibiotics_since_the_last_visit"
+"other_antibiotic"
+"reason_for_stopping_other_antibiotic" 
+```
+
+
+#### are drug columns linked?
+If the `antibiotics` col is "Yes", does the type show up in the drug columns?
+
+
+this info makes it appear that they do not..
+```{r}
+viral_metadata%>%
+  filter(antibiotics == "Yes")%>%
+  select(external_id, participant_id, week_num, antibiotics, lomotil, dipentum_olsalazine, cipro_ciprofloxin)
+
+mgx_metadata%>%
+  filter(antibiotics == "Yes")%>%
+  select(external_id, participant_id, week_num, antibiotics, lomotil, dipentum_olsalazine, cipro_ciprofloxin)
+```
+
+let's check out all the drugs and make a table
+```{r}
+let's check out som
+```
