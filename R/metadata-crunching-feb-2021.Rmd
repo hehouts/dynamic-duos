@@ -1,6 +1,8 @@
 ---
 title: "ibdmdb_dynduo_relevant_participants"
-output: html_document
+output: 
+  html_document: 
+    keep_md: yes
 ---
 
 ```{r setup, include=FALSE}
@@ -20,7 +22,8 @@ This .csv was pulled from the ibdmdb webpage?
 
 
 ```{r}
-reference_metadata <- readr::read_csv("metadata/ibdmdb-metadata-manifests/ihmp_metadata.csv", show_col_types = F)
+setwd("/Users/hehouts/projects/dynamic-duos/R")
+reference_metadata <- readr::read_csv("../metadata/ibdmdb-metadata-manifests/ihmp_metadata.csv", show_col_types = F)
 #tidy names
 metadata <- clean_names(reference_metadata)
 
@@ -209,7 +212,8 @@ P6037
 ## Organize this later:
 Load data
 ```{r}
-metadata <- readr::read_csv("hmp2_metadata.csv")
+metadata <- readr::read_csv("./../metadata/ibdmdb-metadata-manifests/ihmp_metadata.csv")
+#metadata <- readr::read_csv("hmp2_metadata.csv")
 ```
 
 examine data
@@ -344,6 +348,6 @@ tmp4 <- metadata %>%
 ```
 
 ```{r}
-filter(metadata, metadata$`Participant ID` %in% partp_w_virome)
+#filter(metadata, metadata$`Participant ID` %in% partp_w_virome)
 
 ```
