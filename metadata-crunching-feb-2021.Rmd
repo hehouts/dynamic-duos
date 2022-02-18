@@ -19,18 +19,20 @@ library(janitor)
 This .csv was pulled from the ibdmdb webpage?
 
 
-
-
-
-
-
 ```{r}
 reference_metadata <- readr::read_csv("metadata/ibdmdb-metadata-manifests/ihmp_metadata.csv", show_col_types = F)
 #tidy names
 metadata <- clean_names(reference_metadata)
 
 #colnames(metadata)
-head(metadata, 10)
+
+head(metadata, 3)
+
+```
+
+```{r}
+#   # this shows that all lines are ibdmdb
+#filter(metadata, research_project=="ibdmdb")
 ```
 ### isolate viromics & metagenomics data
 (expand to see all bar names)
@@ -88,7 +90,7 @@ colnames(viral_metadata %>% select(contains("ntibiot")))
 ```
 
 
-#### are drug columns linked?
+#### are abx-drug columns linked?
 If the `antibiotics` col is "Yes", does the type show up in the drug columns?
 
 
@@ -103,7 +105,99 @@ mgx_metadata%>%
   select(external_id, participant_id, week_num, antibiotics, lomotil, dipentum_olsalazine, cipro_ciprofloxin)
 ```
 
+```{r}
+##the Antibiotic columns (except abx) dont have data at all, likely stored under a different -omics line, so will find that later. 
+
+
+#
+#exp_metadata <- vir_metadata %>%
+#    filter(abx=="Yes") %>%
+#    select(abx, participant_id)
+#print (exp_metadata)
+#
+#exp_metadata <- vir_metadata %>%
+#    filter(!is.na(abx_since_last_visit))
+#print (exp_metadata)
+#
+#exp_metadata <- vir_metadata %>%
+#    filter(!is.na(abx_past_6_mo))
+#print (exp_metadata)
+#
+#exp_metadata <- vir_metadata %>%
+#    filter(!is.na(abx_other))
+#print (exp_metadata)
+#
+#exp_metadata <- vir_metadata %>%
+#    filter(!is.na(abx_other_reason_for_stopping))
+#print (exp_metadata)
+#
+```
+
 let's check out all the drugs and make a table
 ```{r}
-let's check out som
+
 ```
+### Relevant Participants: 
+
+This is the list of viromics *samples* relevant to the study
+```{r}
+abx_viromx_metadata <- viral_metadata %>%
+    filter(antibiotics=="Yes") %>%
+    arrange(participant_id, week_num)
+
+abx_viromx_metadata
+```
+
+This is the list of *participants* relevant to the study
+```{r}
+participants <- viral_metadata%>%
+    filter(antibiotics=="Yes") %>%
+    arrange(participant_id, week_num) %>%
+    select(participant_id) %>%
+    distinct(participant_id)
+participants
+
+#  #See all with: 
+#View(participants)
+```
+
+#### Participant list:
+```
+participant_id
+C3002
+C3003
+C3008
+C3010
+C3016
+C3017
+C3027
+C3031
+C3034
+C3037
+E5009
+H4006
+H4013
+H4015
+H4016
+H4017
+H4018
+H4024
+H4030
+H4035
+H4038
+H4039
+M2025
+M2028
+M2064
+M2068
+M2069
+M2077
+P6010
+P6016
+P6018
+P6024
+P6028
+P6037
+```
+
+
