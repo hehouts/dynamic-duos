@@ -1,0 +1,19 @@
+---
+title: "Just column names, from ihmp_manifest.csv"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+
+```{r}
+reference_metadata <- readr::read_csv("../metadata/ibdmdb-metadata-manifests/ihmp_metadata.csv", show_col_types = F)
+#tidy names
+metadata <- clean_names(reference_metadata)
+head(metadata, 3)
+```
+
+```{r}
+colnames(metadata)
+```
+
