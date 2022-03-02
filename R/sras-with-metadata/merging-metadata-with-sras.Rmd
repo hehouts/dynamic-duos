@@ -1,0 +1,22 @@
+---
+title: "merging metadata with sras"
+output: 
+  html_document: 
+    keep_md: yes
+date: '2022-03-02'
+---
+
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+
+# has fileID, md5sum, file size, download urls,  and sample ID
+df1<- readr::read_csv("metadata-of-2342-samples/hmp_manifest_47683f7597.tsv")
+
+# has: sample_id	subject_id	subject_uuid	sample_body_site	visit_number	subject_gender	subject_race	study_full_name	project_name
+df2 <- readr::read_csv("metadata-of-2342-samples/hmp_manifest_metadata_b7ce70666.tsv")
+```
+

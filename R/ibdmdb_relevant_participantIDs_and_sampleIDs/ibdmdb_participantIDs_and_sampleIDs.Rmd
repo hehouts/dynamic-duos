@@ -1,0 +1,229 @@
+---
+title: "ibdmdb_dynduo_relevant_participants"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### libraries
+Load libraries
+```{r, echo=FALSE, warning=FALSE}
+library(tidyverse)
+library(janitor)
+```
+
+
+### load data 
+This .csv was pulled from the ibdmdb webpage?
+
+
+```{r}
+setwd("/Users/hehouts/projects/dynamic-duos/R")
+reference_metadata <- readr::read_csv("../metadata/ibdmdb-metadata-manifests/ihmp_metadata.csv", show_col_types = F)
+#tidy names
+metadata <- clean_names(reference_metadata)
+
+#colnames(metadata)
+
+head(metadata, 3)
+
+```
+
+```{r}
+#   # this shows that all lines are ibdmdb
+#filter(metadata, research_project=="ibdmdb")
+```
+### isolate viromics & metagenomics data
+(expand to see all bar names)
+```{r}
+#   #baseR:
+#barplot(table(metadata$data_type))
+
+metadata %>%
+  ggplot(aes(x = data_type))+
+  geom_bar()+
+  coord_flip()
+```
+
+These are samples that are viromic-- they can be filtered by `data_type` or `reads_viral` --both yield the same result.
+```{r}
+#filter(metadata, data_type=="viromics") 
+##   yields 703
+#filter(metadata, !is.na(reads_viral))
+##   yields 703
+#filter(metadata, !is.na(reads_viral) & data_type=="viromics") 
+##   yields 703
+
+viral_metadata <- filter(metadata, data_type=="viromics")
+
+# lets grab metagenomics while we're here:
+mgx_metadata <- filter(metadata, data_type=="metagenomics")
+
+```
+
+### explore antibiotic data
+Very few columns contain antibiotics in the col name. This shows I cant actually filter with regex for the specific drugs.
+"antibiotics"
+"in_the_past_6_months_have_you_used_antibiotics"           
+"were_you_treated_with_antibiotics_before_the_age_of_one"
+"has_the_subject_used_any_antibiotics_since_the_last_visit"
+"other_antibiotic"
+"reason_for_stopping_other_antibiotic"   
+```{r}
+
+#   # T/F table:
+#str_detect(string = colnames(viral_metadata), pattern = "ntibiot")
+
+colnames(viral_metadata %>% select(contains("ntibiot")))
+#  select(str_detect(string = colnames(viral_metadata), pattern = "ntibiot"))
+```
+
+#### "antibiotic" phrase containing vectors:
+```
+"antibiotics"
+"in_the_past_6_months_have_you_used_antibiotics"           
+"were_you_treated_with_antibiotics_before_the_age_of_one"
+"has_the_subject_used_any_antibiotics_since_the_last_visit"
+"other_antibiotic"
+"reason_for_stopping_other_antibiotic" 
+```
+
+
+#### are abx-drug columns linked?
+If the `antibiotics` col is "Yes", does the type show up in the drug columns?
+
+
+this info makes it appear that they do not..
+```{r}
+viral_metadata%>%
+  filter(antibiotics == "Yes")%>%
+  select(external_id, participant_id, week_num, antibiotics, lomotil, dipentum_olsalazine, cipro_ciprofloxin)
+
+mgx_metadata%>%
+  filter(antibiotics == "Yes")%>%
+  select(external_id, participant_id, week_num, antibiotics, lomotil, dipentum_olsalazine, cipro_ciprofloxin)
+```
+
+```{r}
+##the Antibiotic columns (except abx) dont have data at all, likely stored under a different -omics line, so will find that later. 
+
+
+#
+#exp_metadata <- vir_metadata %>%
+#    filter(abx=="Yes") %>%
+#    select(abx, participant_id)
+#print (exp_metadata)
+#
+#exp_metadata <- vir_metadata %>%
+#    filter(!is.na(abx_since_last_visit))
+#print (exp_metadata)
+#
+#exp_metadata <- vir_metadata %>%
+#    filter(!is.na(abx_past_6_mo))
+#print (exp_metadata)
+#
+#exp_metadata <- vir_metadata %>%
+#    filter(!is.na(abx_other))
+#print (exp_metadata)
+#
+#exp_metadata <- vir_metadata %>%
+#    filter(!is.na(abx_other_reason_for_stopping))
+#print (exp_metadata)
+#
+```
+
+let's check out all the drugs and make a table
+```{r}
+
+```
+
+make a table of only relevant columns: sample ID, partp ID, week_num, and drug info. Arrange by participant and week, also
+```{r}
+viral_metadata_drug_cols <- viral_metadata%>%
+  select(external_id, participant_id, week_num, antibiotics, 317:385) %>%
+  arrange(participant_id, week_num)
+
+#examine an example row, 693:
+viral_metadata_drug_cols[693,]
+```
+
+so we can see that this participant had antibiotics, but it doesnt show up in the drug columns, so I am going to investigate that participant outside of the viral metadata set...
+```{r}
+#drug_metadata <- metadata%>%
+metadata %>%
+  select(external_id, participant_id, data_type, project_specific_id, week_num, antibiotics, 317:385) %>%
+  arrange(participant_id, week_num) %>%
+  filter(participant_id == "P6037")
+
+
+#drug_metadata
+```
+### Relevant Participants: 
+
+This is the list of viromics *samples* relevant to the study
+```{r}
+abx_viromx_metadata <- viral_metadata %>%
+    filter(antibiotics=="Yes") %>%
+    arrange(participant_id, week_num)
+
+abx_viromx_metadata
+```
+
+This is the list of *participants* relevant to the study
+```{r}
+participants <- viral_metadata%>%
+    filter(antibiotics=="Yes") %>%
+    arrange(participant_id, week_num) %>%
+    select(participant_id) %>%
+    distinct(participant_id)
+participants
+
+
+
+#  #See all with: 
+#View(participants)
+```
+
+#### Participant list:
+```
+participant_id
+C3002
+C3003
+C3008
+C3010
+C3016
+C3017
+C3027
+C3031
+C3034
+C3037
+E5009
+H4006
+H4013
+H4015
+H4016
+H4017
+H4018
+H4024
+H4030
+H4035
+H4038
+H4039
+M2025
+M2028
+M2064
+M2068
+M2069
+M2077
+P6010
+P6016
+P6018
+P6024
+P6028
+P6037
+```
+
