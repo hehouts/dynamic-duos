@@ -7,7 +7,7 @@ output:
 
 
 
-### libraries
+#### libraries
 Load libraries
 
 ```
@@ -38,7 +38,49 @@ Load libraries
 ##     chisq.test, fisher.test
 ```
 
+## Conclusions:
+1.  List or relevant participant IDs:
+```
+C3002
+C3003
+C3008
+C3010
+C3016
+C3017
+C3027
+C3031
+C3034
+C3037
+E5009
+H4006
+H4013
+H4015
+H4016
+H4017
+H4018
+H4024
+H4030
+H4035
+H4038
+H4039
+M2025
+M2028
+M2064
+M2068
+M2069
+M2077
+P6010
+P6016
+P6018
+P6024
+P6028
+P6037
 
+```
+
+2. Table filtered for those is saved as `rel_partp_ihmp_metadata.csv`
+
+## Methods & Notes:
 ### load data 
 This .csv was pulled from the ibdmdb webpage?
 
@@ -368,6 +410,47 @@ participants
 ```
 
 #### Participant list:
+
+as a vector:  
+
+```r
+relevant_participants <- c("C3002",
+"C3003",
+"C3008",
+"C3010",
+"C3016",
+"C3017",
+"C3027",
+"C3031",
+"C3034",
+"C3037",
+"E5009",
+"H4006",
+"H4013",
+"H4015",
+"H4016",
+"H4017",
+"H4018",
+"H4024",
+"H4030",
+"H4035",
+"H4038",
+"H4039",
+"M2025",
+"M2028",
+"M2064",
+"M2068",
+"M2069",
+"M2077",
+"P6010",
+"P6016",
+"P6018",
+"P6024",
+"P6028",
+"P6037")
+```
+ 
+in text:
 ```
 participant_id
 C3002
@@ -405,4 +488,97 @@ P6024
 P6028
 P6037
 ```
+
+
+
+### Generate a table of "relevant participants"
+
+
+```r
+important_samples <- metadata %>% 
+  filter(data_type == "metagenomics" | data_type == "viromics") %>% 
+  filter(participant_id %in% relevant_participants) %>%
+  arrange(participant_id, data_type, week_num)
+
+write_csv(important_samples, "rel_partp_ihmp_metadata.csv")
+```
+
+
+```r
+# all sample of mgx or vrx data
+
+all_samples <- metadata %>% 
+  filter(data_type == "metagenomics" | data_type == "viromics") %>% 
+#  filter(participant_id %in% relevant_participants) %>%
+  arrange(participant_id, data_type, week_num)
+
+
+
+write_csv(all_samples, "mgx_vrx_ihmp_metadata.csv")
+```
+
+
+```r
+#all mgx & vrx samples from participants that have vrx samples
+pair_vec <- metadata %>% 
+        select(data_type, participant_id) %>% 
+        filter(data_type == "viromics") %>% 
+        unique() %>% 
+        pull(participant_id)
+
+(pair_vec)
+```
+
+```
+##   [1] "C3001" "C3002" "C3003" "C3004" "C3005" "C3006" "C3008" "C3009" "C3010"
+##  [10] "C3011" "C3012" "C3013" "C3015" "C3016" "C3017" "C3021" "C3022" "C3023"
+##  [19] "C3027" "C3028" "C3029" "C3030" "C3031" "C3032" "C3034" "C3035" "C3037"
+##  [28] "E5001" "E5004" "E5009" "E5013" "H4001" "H4004" "H4006" "H4007" "H4008"
+##  [37] "H4009" "H4010" "H4013" "H4014" "H4015" "H4016" "H4017" "H4018" "H4019"
+##  [46] "H4020" "H4022" "H4023" "H4024" "H4027" "H4028" "H4030" "H4031" "H4032"
+##  [55] "H4035" "H4038" "H4039" "H4040" "H4042" "H4043" "H4044" "H4045" "M2008"
+##  [64] "M2014" "M2021" "M2025" "M2026" "M2027" "M2028" "M2034" "M2039" "M2041"
+##  [73] "M2042" "M2047" "M2048" "M2060" "M2061" "M2064" "M2068" "M2069" "M2071"
+##  [82] "M2072" "M2075" "M2077" "M2079" "M2083" "M2084" "M2085" "M2097" "M2103"
+##  [91] "P6005" "P6009" "P6010" "P6012" "P6013" "P6014" "P6016" "P6017" "P6018"
+## [100] "P6024" "P6028" "P6033" "P6035" "P6037" "P6038"
+```
+
+
+
+```r
+pair_samples <- metadata %>% 
+  filter(data_type == "metagenomics" | data_type == "viromics") %>% 
+  filter(participant_id %in% pair_vec) %>%
+  arrange(participant_id, data_type, week_num)
+pair_samples
+```
+
+```
+## # A tibble: 2,299 × 490
+##    project external_id participant_id site_sub_coll data_type    week_num
+##    <chr>   <chr>       <chr>          <chr>         <chr>           <dbl>
+##  1 G79889  CSM5FZ3N_P  C3001          C3001C1       metagenomics        0
+##  2 G79894  CSM5FZ3R_P  C3001          C3001C2       metagenomics        2
+##  3 G79903  CSM5YRY7_P  C3001          C3001C3       metagenomics        4
+##  4 G79913  CSM5FZ3V_P  C3001          C3001C4       metagenomics        6
+##  5 G79926  CSM5FZ4C_P  C3001          C3001C5       metagenomics        8
+##  6 G79969  CSM5MCVD_P  C3001          C3001C7       metagenomics       12
+##  7 G80015  CSM5MCVF_P  C3001          C3001C8       metagenomics       14
+##  8 G79979  CSM5MCVV_P  C3001          C3001C9       metagenomics       16
+##  9 G80050  CSM5MCWI_P  C3001          C3001C10      metagenomics       18
+## 10 G110156 CSM5MCXD    C3001          C3001C11      metagenomics       20
+## # … with 2,289 more rows, and 484 more variables: date_of_receipt <date>,
+## #   interval_days <dbl>, visit_num <dbl>, research_project <chr>,
+## #   pdo_number <chr>, gssr_i_ds <dbl>, product <chr>, lcset <chr>,
+## #   aggregated_lanes <chr>, wr_id <dbl>, number_lanes_in_aggregation <dbl>,
+## #   reads_raw <dbl>, reads_filtered <dbl>, reads_qc_fail <dbl>,
+## #   reads_human <dbl>, reads_ribosomal <dbl>, reads_viral <dbl>, delta <lgl>,
+## #   interval_name <chr>, interval_sequence <dbl>, project_specific_id <dbl>, …
+```
+
+```r
+write_csv(pair_samples, "paired_mgx_vrx_ihmp_metadata.csv")
+```
+
 

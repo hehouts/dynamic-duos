@@ -1,0 +1,19 @@
+---
+title: "Untitled"
+output: html_document
+date: '2022-03-04'
+---
+
+
+```{r}
+
+```
+
+The biosample_result.txt file I can download from the sra website. it doesnt have any join-able data. none. 
+```{bash}
+#ls
+head -n 45 biosample_result.txt
+```
+
+so made a conda env `sratoolkit`, and did `conda install sra-tools` per [this](https://bioconda.github.io/recipes/sra-tools/README.html)
+

@@ -9,14 +9,56 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-### libraries
+#### libraries
 Load libraries
 ```{r, echo=FALSE, warning=FALSE}
 library(tidyverse)
 library(janitor)
 ```
 
+## Conclusions:
+1.  List or relevant participant IDs:
+```
+C3002
+C3003
+C3008
+C3010
+C3016
+C3017
+C3027
+C3031
+C3034
+C3037
+E5009
+H4006
+H4013
+H4015
+H4016
+H4017
+H4018
+H4024
+H4030
+H4035
+H4038
+H4039
+M2025
+M2028
+M2064
+M2068
+M2069
+M2077
+P6010
+P6016
+P6018
+P6024
+P6028
+P6037
 
+```
+
+2. Table filtered for those is saved as `rel_partp_ihmp_metadata.csv`
+
+## Methods & Notes:
 ### load data 
 This .csv was pulled from the ibdmdb webpage?
 
@@ -189,6 +231,46 @@ participants
 ```
 
 #### Participant list:
+
+as a vector:  
+```{r}
+relevant_participants <- c("C3002",
+"C3003",
+"C3008",
+"C3010",
+"C3016",
+"C3017",
+"C3027",
+"C3031",
+"C3034",
+"C3037",
+"E5009",
+"H4006",
+"H4013",
+"H4015",
+"H4016",
+"H4017",
+"H4018",
+"H4024",
+"H4030",
+"H4035",
+"H4038",
+"H4039",
+"M2025",
+"M2028",
+"M2064",
+"M2068",
+"M2069",
+"M2077",
+"P6010",
+"P6016",
+"P6018",
+"P6024",
+"P6028",
+"P6037")
+```
+ 
+in text:
 ```
 participant_id
 C3002
@@ -226,4 +308,54 @@ P6024
 P6028
 P6037
 ```
+
+
+
+### Generate a table of "relevant participants"
+
+```{r}
+important_samples <- metadata %>% 
+  filter(data_type == "metagenomics" | data_type == "viromics") %>% 
+  filter(participant_id %in% relevant_participants) %>%
+  arrange(participant_id, data_type, week_num)
+
+write_csv(important_samples, "rel_partp_ihmp_metadata.csv")
+
+```
+
+```{r}
+# all sample of mgx or vrx data
+
+all_samples <- metadata %>% 
+  filter(data_type == "metagenomics" | data_type == "viromics") %>% 
+#  filter(participant_id %in% relevant_participants) %>%
+  arrange(participant_id, data_type, week_num)
+
+
+
+write_csv(all_samples, "mgx_vrx_ihmp_metadata.csv")
+```
+
+```{r}
+#all mgx & vrx samples from participants that have vrx samples
+pair_vec <- metadata %>% 
+        select(data_type, participant_id) %>% 
+        filter(data_type == "viromics") %>% 
+        unique() %>% 
+        pull(participant_id)
+
+(pair_vec)
+```
+
+
+```{r}
+pair_samples <- metadata %>% 
+  filter(data_type == "metagenomics" | data_type == "viromics") %>% 
+  filter(participant_id %in% pair_vec) %>%
+  arrange(participant_id, data_type, week_num)
+pair_samples
+
+write_csv(pair_samples, "paired_mgx_vrx_ihmp_metadata.csv")
+```
+
 

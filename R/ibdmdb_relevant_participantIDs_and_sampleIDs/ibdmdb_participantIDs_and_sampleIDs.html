@@ -362,8 +362,8 @@ pre code {
 </div>
 
 
-<div id="libraries" class="section level3">
-<h3>libraries</h3>
+<div id="libraries" class="section level4">
+<h4>libraries</h4>
 <p>Load libraries</p>
 <pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
 <pre><code>## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
@@ -379,6 +379,53 @@ pre code {
 ## 
 ##     chisq.test, fisher.test</code></pre>
 </div>
+<div id="conclusions" class="section level2">
+<h2>Conclusions:</h2>
+<ol style="list-style-type: decimal">
+<li>List or relevant participant IDs:</li>
+</ol>
+<pre><code>C3002
+C3003
+C3008
+C3010
+C3016
+C3017
+C3027
+C3031
+C3034
+C3037
+E5009
+H4006
+H4013
+H4015
+H4016
+H4017
+H4018
+H4024
+H4030
+H4035
+H4038
+H4039
+M2025
+M2028
+M2064
+M2068
+M2069
+M2077
+P6010
+P6016
+P6018
+P6024
+P6028
+P6037
+</code></pre>
+<ol start="2" style="list-style-type: decimal">
+<li>Table filtered for those is saved as
+<code>rel_partp_ihmp_metadata.csv</code></li>
+</ol>
+</div>
+<div id="methods-notes" class="section level2">
+<h2>Methods &amp; Notes:</h2>
 <div id="load-data" class="section level3">
 <h3>load data</h3>
 <p>This .csv was pulled from the ibdmdb webpage?</p>
@@ -630,6 +677,42 @@ participants</code></pre>
 #View(participants)</code></pre>
 <div id="participant-list" class="section level4">
 <h4>Participant list:</h4>
+<p>as a vector:</p>
+<pre class="r"><code>relevant_participants &lt;- c(&quot;C3002&quot;,
+&quot;C3003&quot;,
+&quot;C3008&quot;,
+&quot;C3010&quot;,
+&quot;C3016&quot;,
+&quot;C3017&quot;,
+&quot;C3027&quot;,
+&quot;C3031&quot;,
+&quot;C3034&quot;,
+&quot;C3037&quot;,
+&quot;E5009&quot;,
+&quot;H4006&quot;,
+&quot;H4013&quot;,
+&quot;H4015&quot;,
+&quot;H4016&quot;,
+&quot;H4017&quot;,
+&quot;H4018&quot;,
+&quot;H4024&quot;,
+&quot;H4030&quot;,
+&quot;H4035&quot;,
+&quot;H4038&quot;,
+&quot;H4039&quot;,
+&quot;M2025&quot;,
+&quot;M2028&quot;,
+&quot;M2064&quot;,
+&quot;M2068&quot;,
+&quot;M2069&quot;,
+&quot;M2077&quot;,
+&quot;P6010&quot;,
+&quot;P6016&quot;,
+&quot;P6018&quot;,
+&quot;P6024&quot;,
+&quot;P6028&quot;,
+&quot;P6037&quot;)</code></pre>
+<p>in text:</p>
 <pre><code>participant_id
 C3002
 C3003
@@ -665,6 +748,72 @@ P6018
 P6024
 P6028
 P6037</code></pre>
+</div>
+</div>
+<div id="generate-a-table-of-relevant-participants" class="section level3">
+<h3>Generate a table of “relevant participants”</h3>
+<pre class="r"><code>important_samples &lt;- metadata %&gt;% 
+  filter(data_type == &quot;metagenomics&quot; | data_type == &quot;viromics&quot;) %&gt;% 
+  filter(participant_id %in% relevant_participants) %&gt;%
+  arrange(participant_id, data_type, week_num)
+
+write_csv(important_samples, &quot;rel_partp_ihmp_metadata.csv&quot;)</code></pre>
+<pre class="r"><code># all sample of mgx or vrx data
+
+all_samples &lt;- metadata %&gt;% 
+  filter(data_type == &quot;metagenomics&quot; | data_type == &quot;viromics&quot;) %&gt;% 
+#  filter(participant_id %in% relevant_participants) %&gt;%
+  arrange(participant_id, data_type, week_num)
+
+
+
+write_csv(all_samples, &quot;mgx_vrx_ihmp_metadata.csv&quot;)</code></pre>
+<pre class="r"><code>#all mgx &amp; vrx samples from participants that have vrx samples
+pair_vec &lt;- metadata %&gt;% 
+        select(data_type, participant_id) %&gt;% 
+        filter(data_type == &quot;viromics&quot;) %&gt;% 
+        unique() %&gt;% 
+        pull(participant_id)
+
+(pair_vec)</code></pre>
+<pre><code>##   [1] &quot;C3001&quot; &quot;C3002&quot; &quot;C3003&quot; &quot;C3004&quot; &quot;C3005&quot; &quot;C3006&quot; &quot;C3008&quot; &quot;C3009&quot; &quot;C3010&quot;
+##  [10] &quot;C3011&quot; &quot;C3012&quot; &quot;C3013&quot; &quot;C3015&quot; &quot;C3016&quot; &quot;C3017&quot; &quot;C3021&quot; &quot;C3022&quot; &quot;C3023&quot;
+##  [19] &quot;C3027&quot; &quot;C3028&quot; &quot;C3029&quot; &quot;C3030&quot; &quot;C3031&quot; &quot;C3032&quot; &quot;C3034&quot; &quot;C3035&quot; &quot;C3037&quot;
+##  [28] &quot;E5001&quot; &quot;E5004&quot; &quot;E5009&quot; &quot;E5013&quot; &quot;H4001&quot; &quot;H4004&quot; &quot;H4006&quot; &quot;H4007&quot; &quot;H4008&quot;
+##  [37] &quot;H4009&quot; &quot;H4010&quot; &quot;H4013&quot; &quot;H4014&quot; &quot;H4015&quot; &quot;H4016&quot; &quot;H4017&quot; &quot;H4018&quot; &quot;H4019&quot;
+##  [46] &quot;H4020&quot; &quot;H4022&quot; &quot;H4023&quot; &quot;H4024&quot; &quot;H4027&quot; &quot;H4028&quot; &quot;H4030&quot; &quot;H4031&quot; &quot;H4032&quot;
+##  [55] &quot;H4035&quot; &quot;H4038&quot; &quot;H4039&quot; &quot;H4040&quot; &quot;H4042&quot; &quot;H4043&quot; &quot;H4044&quot; &quot;H4045&quot; &quot;M2008&quot;
+##  [64] &quot;M2014&quot; &quot;M2021&quot; &quot;M2025&quot; &quot;M2026&quot; &quot;M2027&quot; &quot;M2028&quot; &quot;M2034&quot; &quot;M2039&quot; &quot;M2041&quot;
+##  [73] &quot;M2042&quot; &quot;M2047&quot; &quot;M2048&quot; &quot;M2060&quot; &quot;M2061&quot; &quot;M2064&quot; &quot;M2068&quot; &quot;M2069&quot; &quot;M2071&quot;
+##  [82] &quot;M2072&quot; &quot;M2075&quot; &quot;M2077&quot; &quot;M2079&quot; &quot;M2083&quot; &quot;M2084&quot; &quot;M2085&quot; &quot;M2097&quot; &quot;M2103&quot;
+##  [91] &quot;P6005&quot; &quot;P6009&quot; &quot;P6010&quot; &quot;P6012&quot; &quot;P6013&quot; &quot;P6014&quot; &quot;P6016&quot; &quot;P6017&quot; &quot;P6018&quot;
+## [100] &quot;P6024&quot; &quot;P6028&quot; &quot;P6033&quot; &quot;P6035&quot; &quot;P6037&quot; &quot;P6038&quot;</code></pre>
+<pre class="r"><code>pair_samples &lt;- metadata %&gt;% 
+  filter(data_type == &quot;metagenomics&quot; | data_type == &quot;viromics&quot;) %&gt;% 
+  filter(participant_id %in% pair_vec) %&gt;%
+  arrange(participant_id, data_type, week_num)
+pair_samples</code></pre>
+<pre><code>## # A tibble: 2,299 × 490
+##    project external_id participant_id site_sub_coll data_type    week_num
+##    &lt;chr&gt;   &lt;chr&gt;       &lt;chr&gt;          &lt;chr&gt;         &lt;chr&gt;           &lt;dbl&gt;
+##  1 G79889  CSM5FZ3N_P  C3001          C3001C1       metagenomics        0
+##  2 G79894  CSM5FZ3R_P  C3001          C3001C2       metagenomics        2
+##  3 G79903  CSM5YRY7_P  C3001          C3001C3       metagenomics        4
+##  4 G79913  CSM5FZ3V_P  C3001          C3001C4       metagenomics        6
+##  5 G79926  CSM5FZ4C_P  C3001          C3001C5       metagenomics        8
+##  6 G79969  CSM5MCVD_P  C3001          C3001C7       metagenomics       12
+##  7 G80015  CSM5MCVF_P  C3001          C3001C8       metagenomics       14
+##  8 G79979  CSM5MCVV_P  C3001          C3001C9       metagenomics       16
+##  9 G80050  CSM5MCWI_P  C3001          C3001C10      metagenomics       18
+## 10 G110156 CSM5MCXD    C3001          C3001C11      metagenomics       20
+## # … with 2,289 more rows, and 484 more variables: date_of_receipt &lt;date&gt;,
+## #   interval_days &lt;dbl&gt;, visit_num &lt;dbl&gt;, research_project &lt;chr&gt;,
+## #   pdo_number &lt;chr&gt;, gssr_i_ds &lt;dbl&gt;, product &lt;chr&gt;, lcset &lt;chr&gt;,
+## #   aggregated_lanes &lt;chr&gt;, wr_id &lt;dbl&gt;, number_lanes_in_aggregation &lt;dbl&gt;,
+## #   reads_raw &lt;dbl&gt;, reads_filtered &lt;dbl&gt;, reads_qc_fail &lt;dbl&gt;,
+## #   reads_human &lt;dbl&gt;, reads_ribosomal &lt;dbl&gt;, reads_viral &lt;dbl&gt;, delta &lt;lgl&gt;,
+## #   interval_name &lt;chr&gt;, interval_sequence &lt;dbl&gt;, project_specific_id &lt;dbl&gt;, …</code></pre>
+<pre class="r"><code>write_csv(pair_samples, &quot;paired_mgx_vrx_ihmp_metadata.csv&quot;)</code></pre>
 </div>
 </div>
 

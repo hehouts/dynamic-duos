@@ -364,6 +364,8 @@ pre code {
 </div>
 
 
+<div id="load-libs-data" class="section level2">
+<h2>Load libs &amp; data</h2>
 <pre class="r"><code>library(tidyverse)</code></pre>
 <pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──</code></pre>
 <pre><code>## ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
@@ -373,24 +375,392 @@ pre code {
 <pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ## x dplyr::filter() masks stats::filter()
 ## x dplyr::lag()    masks stats::lag()</code></pre>
-<pre class="r"><code># has fileID, md5sum, file size, download urls,  and sample ID
-df1&lt;- readr::read_csv(&quot;metadata-of-2342-samples/hmp_manifest_47683f7597.tsv&quot;)</code></pre>
-<pre><code>## Rows: 2341 Columns: 1
+<pre class="r"><code>library(janitor)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;janitor&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## 
+##     chisq.test, fisher.test</code></pre>
+<pre class="r"><code># &quot;Manifest&quot; -- call this &quot;file manifest&quot;
+#   # has fileID, md5sum, file size, download urls,  and sample ID
+file_mani &lt;- readr::read_tsv(&quot;metadata-of-2342-samples/hmp_manifest_47683f7597.tsv&quot;)</code></pre>
+<pre><code>## Rows: 2341 Columns: 5
 ## ── Column specification ────────────────────────────────────────────────────────
-## Delimiter: &quot;,&quot;
-## chr (1): file_id md5 size    urls    sample_id
+## Delimiter: &quot;\t&quot;
+## chr (4): file_id, md5, urls, sample_id
+## dbl (1): size
 ## 
 ## ℹ Use `spec()` to retrieve the full column specification for this data.
 ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<pre class="r"><code># has: sample_id    subject_id  subject_uuid    sample_body_site    visit_number    subject_gender  subject_race    study_full_name project_name
-df2 &lt;- readr::read_csv(&quot;metadata-of-2342-samples/hmp_manifest_metadata_b7ce70666.tsv&quot;)</code></pre>
-<pre><code>## Rows: 2341 Columns: 1
+<pre class="r"><code># this is less likely to be useful?
+
+#&quot;Manifest Metadata&quot; -- call this &quot;sampleID manifest&quot;
+#   # has: sample_id    subject_id  subject_uuid    sample_body_site    visit_number    subject_gender  subject_race    study_full_name project_name
+samp_id_mani &lt;- readr::read_tsv(&quot;metadata-of-2342-samples/hmp_manifest_metadata_b7ce70666.tsv&quot;)</code></pre>
+<pre><code>## Rows: 2341 Columns: 9
 ## ── Column specification ────────────────────────────────────────────────────────
-## Delimiter: &quot;,&quot;
-## chr (1): sample_id   subject_id  subject_uuid    sample_body_site    visit_number    sub...
+## Delimiter: &quot;\t&quot;
+## chr (7): sample_id, subject_uuid, sample_body_site, subject_gender, subject_...
+## dbl (2): subject_id, visit_number
 ## 
 ## ℹ Use `spec()` to retrieve the full column specification for this data.
 ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+<div id="conclusions" class="section level2">
+<h2>Conclusions</h2>
+<ol style="list-style-type: decimal">
+<li><code>sample_id_mani</code> has duplicated rows, so to join to make
+<code>full_file_manifest</code>, I needed to pull unique row.</li>
+<li>to join these with the ihmp metadata, the <code>ihmp_id</code>s will
+have to be pulled from the URL in <code>file_mani</code></li>
+</ol>
+</div>
+<div id="code-summary" class="section level2">
+<h2>Code Summary</h2>
+<pre class="r"><code>file_mani &lt;- readr::read_tsv(&quot;metadata-of-2342-samples/hmp_manifest_47683f7597.tsv&quot;)</code></pre>
+<pre><code>## Rows: 2341 Columns: 5
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;\t&quot;
+## chr (4): file_id, md5, urls, sample_id
+## dbl (1): size
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>samp_id_mani &lt;- readr::read_tsv(&quot;metadata-of-2342-samples/hmp_manifest_metadata_b7ce70666.tsv&quot;)</code></pre>
+<pre><code>## Rows: 2341 Columns: 9
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;\t&quot;
+## chr (7): sample_id, subject_uuid, sample_body_site, subject_gender, subject_...
+## dbl (2): subject_id, visit_number
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>full_file_manifest &lt;- left_join(x = file_mani, y = unique(samp_id_mani))%&gt;%
+  separate(urls, into = c(NA, &quot;ihmp_sample_id&quot;, NA), sep = &quot;/raw/|.tar|.fastq.gz&quot;, remove = F) %&gt;% 
+  relocate(ihmp_sample_id, sample_id, file_id) %&gt;% 
+  arrange(ihmp_sample_id, sample_id, file_id)</code></pre>
+<pre><code>## Joining, by = &quot;sample_id&quot;</code></pre>
+<pre class="r"><code>full_file_manifest</code></pre>
+<pre><code>## # A tibble: 2,341 × 14
+##    ihmp_sample_id sample_id   file_id md5     size urls  subject_id subject_uuid
+##    &lt;chr&gt;          &lt;chr&gt;       &lt;chr&gt;   &lt;chr&gt;  &lt;dbl&gt; &lt;chr&gt;      &lt;dbl&gt; &lt;chr&gt;       
+##  1 CSM5FZ3N_P     cad5930efe… 599427… 0081… 1.58e9 http…       3001 1419f08f554…
+##  2 CSM5FZ3R_P     5994274eae… 599427… 93ee… 2.61e9 http…       3001 1419f08f554…
+##  3 CSM5FZ3T_P     cad5930efe… 599427… 1331… 1.72e9 http…       3002 1419f08f554…
+##  4 CSM5FZ3V_P     5994274eae… 599427… 291b… 2.85e9 http…       3001 1419f08f554…
+##  5 CSM5FZ3X_P     5994274eae… 599427… 8bf2… 2.24e9 http…       3002 1419f08f554…
+##  6 CSM5FZ3Z_P     5994274eae… 599427… c146… 3.82e9 http…       3002 1419f08f554…
+##  7 CSM5FZ42_P     5994274eae… 599427… 6659… 5.11e9 http…       3002 1419f08f554…
+##  8 CSM5FZ44_P     cad5930efe… 599427… bdde… 3.01e9 http…       3002 1419f08f554…
+##  9 CSM5FZ46_P     5994274eae… 599427… 4632… 2.45e9 http…       3002 1419f08f554…
+## 10 CSM5FZ4A_P     cad5930efe… 599427… 9044… 2.96e9 http…       3004 1419f08f554…
+## # … with 2,331 more rows, and 6 more variables: sample_body_site &lt;chr&gt;,
+## #   visit_number &lt;dbl&gt;, subject_gender &lt;chr&gt;, subject_race &lt;chr&gt;,
+## #   study_full_name &lt;chr&gt;, project_name &lt;chr&gt;</code></pre>
+</div>
+<div id="methodsnotes" class="section level2">
+<h2>Methods/Notes</h2>
+<div id="why-this-merge-is-complex" class="section level3">
+<h3>why this merge is complex</h3>
+<p>shows tables arent merging perfectly on <code>sample_id</code>.</p>
+<pre class="r"><code>nrow(file_mani)</code></pre>
+<pre><code>## [1] 2341</code></pre>
+<pre class="r"><code>nrow(samp_id_mani)</code></pre>
+<pre><code>## [1] 2341</code></pre>
+<pre class="r"><code>#inner join should be &lt;= nrow, (2341), but wont be if there are duplicate rows!?
+nrow(inner_join(x = file_mani, y = samp_id_mani, by = &quot;sample_id&quot;))</code></pre>
+<pre><code>## [1] 3873</code></pre>
+</div>
+<div id="properly-merging-file-manifest-sample_id-metadata-manifest" class="section level3">
+<h3>properly merging file manifest &amp; sample_id (metadata)
+manifest</h3>
+<p>Shows we have redundant sample IDs, no redundant file_ids in
+<code>file_mani</code> df.</p>
+<pre class="r"><code># distinct sample ids
+n_distinct(file_mani$sample_id)</code></pre>
+<pre><code>## [1] 1613</code></pre>
+<pre class="r"><code>n_distinct(samp_id_mani$sample_id)</code></pre>
+<pre><code>## [1] 1613</code></pre>
+<pre class="r"><code># distinct file IDs
+n_distinct(file_mani$file_id)</code></pre>
+<pre><code>## [1] 2341</code></pre>
+<p>Shows that sample_ids each have 2 files, from 1 dl link, that
+probably represent r1 &amp; r2. also, metadata to match the sample ids
+in the ihmp metadata are probably best pulled from the url.</p>
+<pre class="r"><code>file_mani %&gt;% 
+  filter(sample_id == &quot;1419f08f554e0c93f3b62fe90cf540d0&quot;)</code></pre>
+<pre><code>## # A tibble: 2 × 5
+##   file_id                          md5                      size urls  sample_id
+##   &lt;chr&gt;                            &lt;chr&gt;                   &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;    
+## 1 56bda9b020293b4b1d65e1eb25368a8b d8f8c1cad1fa1a62b5df2… 8.55e7 http… 1419f08f…
+## 2 1419f08f554e0c93f3b62fe90cf563c5 9fa9cd301d20271365d23… 7.92e8 http… 1419f08f…</code></pre>
+<p>Shows that there are fully redundant rows in the samp_id_mani, that I
+suppose stems from the file_mani.</p>
+<pre class="r"><code>samp_id_mani %&gt;% 
+  filter(sample_id == &quot;1419f08f554e0c93f3b62fe90cf540d0&quot;)</code></pre>
+<pre><code>## # A tibble: 2 × 9
+##   sample_id subject_id subject_uuid sample_body_site visit_number subject_gender
+##   &lt;chr&gt;          &lt;dbl&gt; &lt;chr&gt;        &lt;chr&gt;                   &lt;dbl&gt; &lt;chr&gt;         
+## 1 1419f08f…       2008 1419f08f554… feces                      25 female        
+## 2 1419f08f…       2008 1419f08f554… feces                      25 female        
+## # … with 3 more variables: subject_race &lt;chr&gt;, study_full_name &lt;chr&gt;,
+## #   project_name &lt;chr&gt;</code></pre>
+<pre class="r"><code>samp_id_mani %&gt;% 
+  unique()</code></pre>
+<pre><code>## # A tibble: 1,613 × 9
+##    sample_id               subject_id subject_uuid sample_body_site visit_number
+##    &lt;chr&gt;                        &lt;dbl&gt; &lt;chr&gt;        &lt;chr&gt;                   &lt;dbl&gt;
+##  1 1419f08f554e0c93f3b62f…       2008 1419f08f554… feces                      23
+##  2 d39c1941c8f6e8b0f6ead5…       2008 1419f08f554… feces                      14
+##  3 1419f08f554e0c93f3b62f…       2008 1419f08f554… feces                       6
+##  4 d39c1941c8f6e8b0f6ead5…       2008 1419f08f554… feces                      15
+##  5 d39c1941c8f6e8b0f6ead5…       2008 1419f08f554… feces                      21
+##  6 d39c1941c8f6e8b0f6ead5…       2008 1419f08f554… feces                      12
+##  7 d39c1941c8f6e8b0f6ead5…       2008 1419f08f554… feces                      18
+##  8 1419f08f554e0c93f3b62f…       2008 1419f08f554… feces                      28
+##  9 1419f08f554e0c93f3b62f…       2008 1419f08f554… feces                      11
+## 10 1419f08f554e0c93f3b62f…       2008 1419f08f554… feces                      22
+## # … with 1,603 more rows, and 4 more variables: subject_gender &lt;chr&gt;,
+## #   subject_race &lt;chr&gt;, study_full_name &lt;chr&gt;, project_name &lt;chr&gt;</code></pre>
+<p>join properly, yielding the expected 2341 rows</p>
+<pre class="r"><code>full_file_manifest &lt;- left_join(x = file_mani, y = unique(samp_id_mani))</code></pre>
+<pre><code>## Joining, by = &quot;sample_id&quot;</code></pre>
+<pre class="r"><code>names(full_file_manifest)</code></pre>
+<pre><code>##  [1] &quot;file_id&quot;          &quot;md5&quot;              &quot;size&quot;             &quot;urls&quot;            
+##  [5] &quot;sample_id&quot;        &quot;subject_id&quot;       &quot;subject_uuid&quot;     &quot;sample_body_site&quot;
+##  [9] &quot;visit_number&quot;     &quot;subject_gender&quot;   &quot;subject_race&quot;     &quot;study_full_name&quot; 
+## [13] &quot;project_name&quot;</code></pre>
+<pre class="r"><code>full_file_manifest %&gt;%
+  relocate(sample_id) %&gt;%
+  arrange(sample_id, file_id)</code></pre>
+<pre><code>## # A tibble: 2,341 × 13
+##    sample_id file_id md5     size urls  subject_id subject_uuid sample_body_site
+##    &lt;chr&gt;     &lt;chr&gt;   &lt;chr&gt;  &lt;dbl&gt; &lt;chr&gt;      &lt;dbl&gt; &lt;chr&gt;        &lt;chr&gt;           
+##  1 1419f08f… 1419f0… 6c83… 1.05e9 http…       3001 1419f08f554… feces           
+##  2 1419f08f… 56bda9… 1eb2… 3.60e6 http…       3001 1419f08f554… feces           
+##  3 1419f08f… 1419f0… 5334… 1.32e9 http…       3001 1419f08f554… feces           
+##  4 1419f08f… 1419f0… e8cb… 9.81e8 http…       3001 1419f08f554… feces           
+##  5 1419f08f… 1419f0… b5d6… 1.03e9 http…       3001 1419f08f554… feces           
+##  6 1419f08f… 56bda9… ce38… 8.50e7 http…       3001 1419f08f554… feces           
+##  7 1419f08f… 1419f0… f652… 2.21e8 http…       3001 1419f08f554… feces           
+##  8 1419f08f… 1419f0… 2df8… 1.56e9 http…       3001 1419f08f554… feces           
+##  9 1419f08f… 1419f0… 3f87… 1.49e9 http…       3001 1419f08f554… feces           
+## 10 1419f08f… 56bda9… 194c… 1.34e8 http…       3001 1419f08f554… feces           
+## # … with 2,331 more rows, and 5 more variables: visit_number &lt;dbl&gt;,
+## #   subject_gender &lt;chr&gt;, subject_race &lt;chr&gt;, study_full_name &lt;chr&gt;,
+## #   project_name &lt;chr&gt;</code></pre>
+<pre class="r"><code>full_file_manifest &lt;- left_join(x = file_mani, y = unique(samp_id_mani)) %&gt;%
+  relocate(sample_id) %&gt;%
+  arrange(sample_id, file_id)</code></pre>
+<pre><code>## Joining, by = &quot;sample_id&quot;</code></pre>
+<pre class="r"><code>full_file_manifest</code></pre>
+<pre><code>## # A tibble: 2,341 × 13
+##    sample_id file_id md5     size urls  subject_id subject_uuid sample_body_site
+##    &lt;chr&gt;     &lt;chr&gt;   &lt;chr&gt;  &lt;dbl&gt; &lt;chr&gt;      &lt;dbl&gt; &lt;chr&gt;        &lt;chr&gt;           
+##  1 1419f08f… 1419f0… 6c83… 1.05e9 http…       3001 1419f08f554… feces           
+##  2 1419f08f… 56bda9… 1eb2… 3.60e6 http…       3001 1419f08f554… feces           
+##  3 1419f08f… 1419f0… 5334… 1.32e9 http…       3001 1419f08f554… feces           
+##  4 1419f08f… 1419f0… e8cb… 9.81e8 http…       3001 1419f08f554… feces           
+##  5 1419f08f… 1419f0… b5d6… 1.03e9 http…       3001 1419f08f554… feces           
+##  6 1419f08f… 56bda9… ce38… 8.50e7 http…       3001 1419f08f554… feces           
+##  7 1419f08f… 1419f0… f652… 2.21e8 http…       3001 1419f08f554… feces           
+##  8 1419f08f… 1419f0… 2df8… 1.56e9 http…       3001 1419f08f554… feces           
+##  9 1419f08f… 1419f0… 3f87… 1.49e9 http…       3001 1419f08f554… feces           
+## 10 1419f08f… 56bda9… 194c… 1.34e8 http…       3001 1419f08f554… feces           
+## # … with 2,331 more rows, and 5 more variables: visit_number &lt;dbl&gt;,
+## #   subject_gender &lt;chr&gt;, subject_race &lt;chr&gt;, study_full_name &lt;chr&gt;,
+## #   project_name &lt;chr&gt;</code></pre>
+<p>Working with only the <code>file_mani</code>:</p>
+<pre class="r"><code>full_file_manifest &lt;- left_join(x = file_mani, y = unique(samp_id_mani)) %&gt;%
+  arrange(sample_id, file_id) %&gt;% 
+  relocate(sample_id)</code></pre>
+<pre><code>## Joining, by = &quot;sample_id&quot;</code></pre>
+<pre class="r"><code>full_file_manifest</code></pre>
+<pre><code>## # A tibble: 2,341 × 13
+##    sample_id file_id md5     size urls  subject_id subject_uuid sample_body_site
+##    &lt;chr&gt;     &lt;chr&gt;   &lt;chr&gt;  &lt;dbl&gt; &lt;chr&gt;      &lt;dbl&gt; &lt;chr&gt;        &lt;chr&gt;           
+##  1 1419f08f… 1419f0… 6c83… 1.05e9 http…       3001 1419f08f554… feces           
+##  2 1419f08f… 56bda9… 1eb2… 3.60e6 http…       3001 1419f08f554… feces           
+##  3 1419f08f… 1419f0… 5334… 1.32e9 http…       3001 1419f08f554… feces           
+##  4 1419f08f… 1419f0… e8cb… 9.81e8 http…       3001 1419f08f554… feces           
+##  5 1419f08f… 1419f0… b5d6… 1.03e9 http…       3001 1419f08f554… feces           
+##  6 1419f08f… 56bda9… ce38… 8.50e7 http…       3001 1419f08f554… feces           
+##  7 1419f08f… 1419f0… f652… 2.21e8 http…       3001 1419f08f554… feces           
+##  8 1419f08f… 1419f0… 2df8… 1.56e9 http…       3001 1419f08f554… feces           
+##  9 1419f08f… 1419f0… 3f87… 1.49e9 http…       3001 1419f08f554… feces           
+## 10 1419f08f… 56bda9… 194c… 1.34e8 http…       3001 1419f08f554… feces           
+## # … with 2,331 more rows, and 5 more variables: visit_number &lt;dbl&gt;,
+## #   subject_gender &lt;chr&gt;, subject_race &lt;chr&gt;, study_full_name &lt;chr&gt;,
+## #   project_name &lt;chr&gt;</code></pre>
+<pre class="r"><code>#deets on the regex-based sep function: https://stackoverflow.com/questions/43130645/multiple-separate-arguments-in-tidyrs-separate-function
+
+
+# this splits on the prefix, and one or two possible suffixes. visually inspected results, seems to work. see filtered evidence below
+full_file_manifest %&gt;%
+  separate(urls, into = c(NA, &quot;ihmp_sample_id&quot;, NA), sep = &quot;/raw/|.tar|.fastq.gz&quot;, remove = F) %&gt;% 
+  relocate(ihmp_sample_id) %&gt;% 
+  select(ihmp_sample_id, urls) %&gt;% 
+  filter(ihmp_sample_id == &quot;CSM79HGF_P&quot; | ihmp_sample_id == &quot;CSM79HPK&quot;) # notice urls extensions </code></pre>
+<pre><code>## # A tibble: 3 × 2
+##   ihmp_sample_id urls                                                           
+##   &lt;chr&gt;          &lt;chr&gt;                                                          
+## 1 CSM79HGF_P     https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/r…
+## 2 CSM79HPK       https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/r…
+## 3 CSM79HPK       https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/r…</code></pre>
+<pre class="r"><code>full_file_manifest &lt;- full_file_manifest %&gt;%
+  separate(urls, into = c(NA, &quot;ihmp_sample_id&quot;, NA), sep = &quot;/raw/|.tar|.fastq.gz&quot;, remove = F) %&gt;% 
+  relocate(ihmp_sample_id)
+full_file_manifest</code></pre>
+<pre><code>## # A tibble: 2,341 × 14
+##    ihmp_sample_id sample_id   file_id md5     size urls  subject_id subject_uuid
+##    &lt;chr&gt;          &lt;chr&gt;       &lt;chr&gt;   &lt;chr&gt;  &lt;dbl&gt; &lt;chr&gt;      &lt;dbl&gt; &lt;chr&gt;       
+##  1 CSM5MCXD       1419f08f55… 1419f0… 6c83… 1.05e9 http…       3001 1419f08f554…
+##  2 CSM5MCXD       1419f08f55… 56bda9… 1eb2… 3.60e6 http…       3001 1419f08f554…
+##  3 CSM5MCYS       1419f08f55… 1419f0… 5334… 1.32e9 http…       3001 1419f08f554…
+##  4 CSM67U9J       1419f08f55… 1419f0… e8cb… 9.81e8 http…       3001 1419f08f554…
+##  5 CSM67UA2       1419f08f55… 1419f0… b5d6… 1.03e9 http…       3001 1419f08f554…
+##  6 CSM67UA2       1419f08f55… 56bda9… ce38… 8.50e7 http…       3001 1419f08f554…
+##  7 CSM67UGC       1419f08f55… 1419f0… f652… 2.21e8 http…       3001 1419f08f554…
+##  8 CSM79HG5       1419f08f55… 1419f0… 2df8… 1.56e9 http…       3001 1419f08f554…
+##  9 CSM79HGP       1419f08f55… 1419f0… 3f87… 1.49e9 http…       3001 1419f08f554…
+## 10 CSM79HGP       1419f08f55… 56bda9… 194c… 1.34e8 http…       3001 1419f08f554…
+## # … with 2,331 more rows, and 6 more variables: sample_body_site &lt;chr&gt;,
+## #   visit_number &lt;dbl&gt;, subject_gender &lt;chr&gt;, subject_race &lt;chr&gt;,
+## #   study_full_name &lt;chr&gt;, project_name &lt;chr&gt;</code></pre>
+</div>
+<div id="merging-with-ihmp" class="section level3">
+<h3>merging with ihmp</h3>
+<p>reminder, we are here</p>
+<pre class="r"><code>file_mani &lt;- readr::read_tsv(&quot;metadata-of-2342-samples/hmp_manifest_47683f7597.tsv&quot;)</code></pre>
+<pre><code>## Rows: 2341 Columns: 5
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;\t&quot;
+## chr (4): file_id, md5, urls, sample_id
+## dbl (1): size
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>samp_id_mani &lt;- readr::read_tsv(&quot;metadata-of-2342-samples/hmp_manifest_metadata_b7ce70666.tsv&quot;)</code></pre>
+<pre><code>## Rows: 2341 Columns: 9
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;\t&quot;
+## chr (7): sample_id, subject_uuid, sample_body_site, subject_gender, subject_...
+## dbl (2): subject_id, visit_number
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>full_file_manifest &lt;- left_join(x = file_mani, y = unique(samp_id_mani))%&gt;%
+  separate(urls, into = c(NA, &quot;ihmp_sample_id&quot;, NA), sep = &quot;/raw/|.tar|.fastq.gz&quot;, remove = F) %&gt;% 
+  relocate(ihmp_sample_id, sample_id, file_id) %&gt;% 
+  arrange(ihmp_sample_id, sample_id, file_id)</code></pre>
+<pre><code>## Joining, by = &quot;sample_id&quot;</code></pre>
+<pre class="r"><code>full_file_manifest</code></pre>
+<pre><code>## # A tibble: 2,341 × 14
+##    ihmp_sample_id sample_id   file_id md5     size urls  subject_id subject_uuid
+##    &lt;chr&gt;          &lt;chr&gt;       &lt;chr&gt;   &lt;chr&gt;  &lt;dbl&gt; &lt;chr&gt;      &lt;dbl&gt; &lt;chr&gt;       
+##  1 CSM5FZ3N_P     cad5930efe… 599427… 0081… 1.58e9 http…       3001 1419f08f554…
+##  2 CSM5FZ3R_P     5994274eae… 599427… 93ee… 2.61e9 http…       3001 1419f08f554…
+##  3 CSM5FZ3T_P     cad5930efe… 599427… 1331… 1.72e9 http…       3002 1419f08f554…
+##  4 CSM5FZ3V_P     5994274eae… 599427… 291b… 2.85e9 http…       3001 1419f08f554…
+##  5 CSM5FZ3X_P     5994274eae… 599427… 8bf2… 2.24e9 http…       3002 1419f08f554…
+##  6 CSM5FZ3Z_P     5994274eae… 599427… c146… 3.82e9 http…       3002 1419f08f554…
+##  7 CSM5FZ42_P     5994274eae… 599427… 6659… 5.11e9 http…       3002 1419f08f554…
+##  8 CSM5FZ44_P     cad5930efe… 599427… bdde… 3.01e9 http…       3002 1419f08f554…
+##  9 CSM5FZ46_P     5994274eae… 599427… 4632… 2.45e9 http…       3002 1419f08f554…
+## 10 CSM5FZ4A_P     cad5930efe… 599427… 9044… 2.96e9 http…       3004 1419f08f554…
+## # … with 2,331 more rows, and 6 more variables: sample_body_site &lt;chr&gt;,
+## #   visit_number &lt;dbl&gt;, subject_gender &lt;chr&gt;, subject_race &lt;chr&gt;,
+## #   study_full_name &lt;chr&gt;, project_name &lt;chr&gt;</code></pre>
+<p>lets try merging <code>full_file_manifest</code> with
+<code>ihmp_metadata</code> on <code>ihmp_sample_id</code></p>
+<pre class="r"><code>ihmp &lt;- readr::read_csv(&quot;paired_mgx_vrx_ihmp_metadata.csv&quot;)%&gt;% 
+  rename(&quot;ihmp_sample_id&quot; = external_id)</code></pre>
+<pre><code>## Rows: 0 Columns: 490
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (490): project, external_id, participant_id, site_sub_coll, data_type, w...
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>#ihmp
+#</code></pre>
+<pre class="r"><code>nrow(ihmp)</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code>nrow(full_file_manifest)</code></pre>
+<pre><code>## [1] 2341</code></pre>
+<pre class="r"><code>n_distinct(ihmp$ihmp_sample_id)</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code>n_distinct(full_file_manifest$ihmp_sample_id)</code></pre>
+<pre><code>## [1] 1656</code></pre>
+<pre class="r"><code>571*2</code></pre>
+<pre><code>## [1] 1142</code></pre>
+<pre class="r"><code>df &lt;- left_join(ihmp, full_file_manifest, &quot;ihmp_sample_id&quot;)
+#right_join(ihmp, full_file_manifest, &quot;ihmp_sample_id&quot;)</code></pre>
+<pre class="r"><code>sra_mani &lt;- readr::read_csv(&quot;sra-manifest.csv&quot;) </code></pre>
+<pre><code>## Rows: 378 Columns: 17
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr (12): Experiment Accession, Experiment Title, Organism Name, Instrument,...
+## dbl  (4): Total Size, Mb, Total RUNs, Total Spots, Total Bases
+## lgl  (1): Sample Title
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>sra_mani &lt;- clean_names(sra_mani)
+
+head(sra_mani, 2)</code></pre>
+<pre><code>## # A tibble: 2 × 17
+##   experiment_accession experiment_title       organism_name instrument submitter
+##   &lt;chr&gt;                &lt;chr&gt;                  &lt;chr&gt;         &lt;chr&gt;      &lt;chr&gt;    
+## 1 SRX3139489           fecal sample from HMP… human gut me… Illumina … Harvard …
+## 2 SRX3139488           fecal sample from HMP… human gut me… Illumina … Harvard …
+## # … with 12 more variables: study_accession &lt;chr&gt;, study_title &lt;chr&gt;,
+## #   sample_accession &lt;chr&gt;, sample_title &lt;lgl&gt;, total_size_mb &lt;dbl&gt;,
+## #   total_ru_ns &lt;dbl&gt;, total_spots &lt;dbl&gt;, total_bases &lt;dbl&gt;,
+## #   library_name &lt;chr&gt;, library_strategy &lt;chr&gt;, library_source &lt;chr&gt;,
+## #   library_selection &lt;chr&gt;</code></pre>
+<pre class="r"><code>sra_mani &lt;- sra_mani %&gt;% 
+  separate(experiment_title, c(NA,&quot;ihmp_sample_id&quot;,NA), sep = &quot;Subject |_MG&quot;, remove = F) %&gt;% 
+  relocate(ihmp_sample_id)</code></pre>
+<pre><code>## Warning: Expected 3 pieces. Missing pieces filled with `NA` in 78 rows [223,
+## 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239,
+## 240, 241, 242, ...].</code></pre>
+<pre class="r"><code>sra_mani</code></pre>
+<pre><code>## # A tibble: 378 × 18
+##    ihmp_sample_id experiment_accession experiment_title organism_name instrument
+##    &lt;chr&gt;          &lt;chr&gt;                &lt;chr&gt;            &lt;chr&gt;         &lt;chr&gt;     
+##  1 H4020C2        SRX3139489           fecal sample fr… human gut me… Illumina …
+##  2 C3011C6        SRX3139488           fecal sample fr… human gut me… Illumina …
+##  3 H4022C1        SRX3139487           fecal sample fr… human gut me… Illumina …
+##  4 C3017C3        SRX3139486           fecal sample fr… human gut me… Illumina …
+##  5 C3011C5        SRX3139485           fecal sample fr… human gut me… Illumina …
+##  6 C3017C1        SRX3139484           fecal sample fr… human gut me… Illumina …
+##  7 C3013C5        SRX3139483           fecal sample fr… human gut me… Illumina …
+##  8 C3011C7        SRX3139482           fecal sample fr… human gut me… Illumina …
+##  9 C3010C4        SRX3139481           fecal sample fr… human gut me… Illumina …
+## 10 C3011C2        SRX3139480           fecal sample fr… human gut me… Illumina …
+## # … with 368 more rows, and 13 more variables: submitter &lt;chr&gt;,
+## #   study_accession &lt;chr&gt;, study_title &lt;chr&gt;, sample_accession &lt;chr&gt;,
+## #   sample_title &lt;lgl&gt;, total_size_mb &lt;dbl&gt;, total_ru_ns &lt;dbl&gt;,
+## #   total_spots &lt;dbl&gt;, total_bases &lt;dbl&gt;, library_name &lt;chr&gt;,
+## #   library_strategy &lt;chr&gt;, library_source &lt;chr&gt;, library_selection &lt;chr&gt;</code></pre>
+<pre class="r"><code>#ihmp_sample_id, experiment_accession, study_accession, sample_accession, library_name
+#names(df)
+
+trim_df &lt;- df %&gt;% select(ihmp_sample_id, participant_id, data_type, week_num, interval_days, project)
+
+trim_sra &lt;- sra_mani %&gt;% select(ihmp_sample_id, experiment_accession, study_accession, sample_accession, library_name)</code></pre>
+<pre class="r"><code>inner_join(trim_sra, trim_df, &quot;ihmp_sample_id&quot;)# %&gt;% </code></pre>
+<pre><code>## # A tibble: 0 × 10
+## # … with 10 variables: ihmp_sample_id &lt;chr&gt;, experiment_accession &lt;chr&gt;,
+## #   study_accession &lt;chr&gt;, sample_accession &lt;chr&gt;, library_name &lt;chr&gt;,
+## #   participant_id &lt;chr&gt;, data_type &lt;chr&gt;, week_num &lt;chr&gt;, interval_days &lt;chr&gt;,
+## #   project &lt;chr&gt;</code></pre>
+<pre class="r"><code>#   relocate(sample_accession, participant_id, data_type, week_num, interval_days, #ihmp_sample_id, project, experiment_accession, study_accession, library_name) %&gt;% 
+#  arrange(&quot;participant_id, data_type, week_num,&quot;)
+#</code></pre>
+</div>
+</div>
 
 
 
