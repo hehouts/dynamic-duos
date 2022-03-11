@@ -1,0 +1,239 @@
+---
+title: "merging metadata with sras"
+output: 
+  html_document: 
+    keep_md: yes
+date: '2022-03-02'
+---
+
+## Load libs & data
+```{r}
+library(tidyverse)
+library(janitor)
+```
+```{r}
+# "Manifest" -- call this "file manifest"
+#   # has fileID, md5sum, file size, download urls,  and sample ID
+file_mani <- readr::read_tsv("metadata-of-2342-samples/hmp_manifest_47683f7597.tsv")
+# this is less likely to be useful?
+
+#"Manifest Metadata" -- call this "sampleID manifest"
+#   # has: sample_id	subject_id	subject_uuid	sample_body_site	visit_number	subject_gender	subject_race	study_full_name	project_name
+samp_id_mani <- readr::read_tsv("metadata-of-2342-samples/hmp_manifest_metadata_b7ce70666.tsv")
+```
+## Conclusions
+1. `sample_id_mani` has duplicated rows, so to join to make `full_file_manifest`, I needed to pull unique row. 
+2. to join these with the ihmp metadata, the `ihmp_id`s will have to be pulled from the URL in `file_mani`
+
+## Code Summary
+```{r}
+file_mani <- readr::read_tsv("metadata-of-2342-samples/hmp_manifest_47683f7597.tsv")
+samp_id_mani <- readr::read_tsv("metadata-of-2342-samples/hmp_manifest_metadata_b7ce70666.tsv")
+
+
+full_file_manifest <- left_join(x = file_mani, y = unique(samp_id_mani))%>%
+  separate(urls, into = c(NA, "ihmp_sample_id", NA), sep = "/raw/|.tar|.fastq.gz", remove = F) %>% 
+  relocate(ihmp_sample_id, sample_id, file_id) %>% 
+  arrange(ihmp_sample_id, sample_id, file_id)
+full_file_manifest
+  
+```
+
+
+
+## Methods/Notes
+
+### why this merge is complex
+shows tables arent merging perfectly on `sample_id`.
+
+```{r}
+nrow(file_mani)
+
+nrow(samp_id_mani)
+```
+
+```{r}
+#inner join should be <= nrow, (2341), but wont be if there are duplicate rows!?
+nrow(inner_join(x = file_mani, y = samp_id_mani, by = "sample_id"))
+```
+
+### properly merging file manifest & sample_id (metadata) manifest
+
+Shows we have redundant sample IDs, no redundant file_ids in `file_mani` df.
+```{r}
+
+# distinct sample ids
+n_distinct(file_mani$sample_id)
+n_distinct(samp_id_mani$sample_id)
+
+# distinct file IDs
+n_distinct(file_mani$file_id)
+```
+
+Shows that sample_ids each have 2 files, from 1 dl link, that probably represent r1 & r2. 
+also, metadata to match the sample ids in the ihmp metadata are probably best pulled from the url. 
+```{r}
+file_mani %>% 
+  filter(sample_id == "1419f08f554e0c93f3b62fe90cf540d0")
+```
+
+Shows that there are fully redundant rows in the samp_id_mani, that I suppose stems from the file_mani.
+```{r}
+samp_id_mani %>% 
+  filter(sample_id == "1419f08f554e0c93f3b62fe90cf540d0")
+
+samp_id_mani %>% 
+  unique()
+```
+
+join properly, yielding the expected 2341 rows
+```{r}
+full_file_manifest <- left_join(x = file_mani, y = unique(samp_id_mani))
+
+names(full_file_manifest)
+
+full_file_manifest %>%
+  relocate(sample_id) %>%
+  arrange(sample_id, file_id)
+
+full_file_manifest <- left_join(x = file_mani, y = unique(samp_id_mani)) %>%
+  relocate(sample_id) %>%
+  arrange(sample_id, file_id)
+full_file_manifest
+
+```
+
+
+Working with only the `file_mani`:
+
+```{r}
+full_file_manifest <- left_join(x = file_mani, y = unique(samp_id_mani)) %>%
+  arrange(sample_id, file_id) %>% 
+  relocate(sample_id)
+full_file_manifest
+```
+
+```{r}
+#deets on the regex-based sep function: https://stackoverflow.com/questions/43130645/multiple-separate-arguments-in-tidyrs-separate-function
+
+
+# this splits on the prefix, and one or two possible suffixes. visually inspected results, seems to work. see filtered evidence below
+full_file_manifest %>%
+  separate(urls, into = c(NA, "ihmp_sample_id", NA), sep = "/raw/|.tar|.fastq.gz", remove = F) %>% 
+  relocate(ihmp_sample_id) %>% 
+  select(ihmp_sample_id, urls) %>% 
+  filter(ihmp_sample_id == "CSM79HGF_P" | ihmp_sample_id == "CSM79HPK") # notice urls extensions 
+
+full_file_manifest <- full_file_manifest %>%
+  separate(urls, into = c(NA, "ihmp_sample_id", NA), sep = "/raw/|.tar|.fastq.gz", remove = F) %>% 
+  relocate(ihmp_sample_id)
+full_file_manifest
+```
+
+
+### merging with ihmp
+
+reminder, we are here
+```{r}
+file_mani <- readr::read_tsv("metadata-of-2342-samples/hmp_manifest_47683f7597.tsv")
+samp_id_mani <- readr::read_tsv("metadata-of-2342-samples/hmp_manifest_metadata_b7ce70666.tsv")
+
+
+full_file_manifest <- left_join(x = file_mani, y = unique(samp_id_mani))%>%
+  separate(urls, into = c(NA, "ihmp_sample_id", NA), sep = "/raw/|.tar|.fastq.gz", remove = F) %>% 
+  relocate(ihmp_sample_id, sample_id, file_id) %>% 
+  arrange(ihmp_sample_id, sample_id, file_id)
+full_file_manifest
+```
+
+lets try merging `full_file_manifest` with `ihmp_metadata` on `ihmp_sample_id`
+*lol it didnt work
+```{r}
+ihmp <- readr::read_csv("../ibdmdb_relevant_participantIDs_and_sampleIDs/paired_mgx_vrx_ihmp_metadata.csv")%>% 
+  rename("ihmp_sample_id" = external_id)
+
+#ihmp
+#
+```
+
+```{r}
+nrow(ihmp)
+nrow(full_file_manifest)
+```
+```{r}
+n_distinct(ihmp$ihmp_sample_id)
+
+n_distinct(full_file_manifest$ihmp_sample_id)
+
+```
+
+
+```{r}
+df <- left_join(ihmp, full_file_manifest, "ihmp_sample_id")
+#right_join(ihmp, full_file_manifest, "ihmp_sample_id")
+```
+
+```{r}
+sra_mani <- readr::read_csv("sra-manifest.csv") 
+sra_mani <- clean_names(sra_mani)
+
+head(sra_mani, 2)
+
+sra_mani <- sra_mani %>% 
+  separate(experiment_title, c(NA,"ihmp_sample_id",NA), sep = "Subject |_MG", remove = F) %>% 
+  relocate(ihmp_sample_id)
+sra_mani
+
+
+```
+
+```{r}
+
+#ihmp_sample_id, experiment_accession, study_accession, sample_accession, library_name
+#names(df)
+
+trim_df <- df %>% select(ihmp_sample_id, participant_id, data_type, week_num, interval_days, project) %>% arrange(participant_id, data_type, week_num)
+
+trim_sra <- sra_mani %>% select(ihmp_sample_id, experiment_accession, study_accession, sample_accession, library_name) %>% arrange(ihmp_sample_id)
+
+trim_df
+
+trim_sra
+
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("sradb")
+
+```
+
+
+```{r}
+inner_join(trim_sra, trim_df, "ihmp_sample_id")# %>% 
+ 
+  
+  
+#   relocate(sample_accession, participant_id, data_type, week_num, interval_days, #ihmp_sample_id, project, experiment_accession, study_accession, library_name) %>% 
+#  arrange("participant_id, data_type, week_num,")
+#
+```
+
+
+
+### dear god, I guess I need software now
+
+
+somehow, this installed  [sradb](https://www.bioconductor.org/packages/release/bioc/html/SRAdb.html) (repo [here](https://github.com/ncbi/sra-tools)) 
+```{r}
+#if (!require("BiocManager", quietly = TRUE))
+#    install.packages("BiocManager")
+#
+#BiocManager::install("SRAdb")
+
+library("SRAdb")
+```
+
+
+
+
+
+

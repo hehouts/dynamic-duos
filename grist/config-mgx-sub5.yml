@@ -1,0 +1,11 @@
+samples:
+- data/intermediate-files/kmer/SM-76C9Y.kmertrim.fq.gz
+- data/intermediate-files/kmer/SM-7CP39.kmertrim.fq.gz
+- data/intermediate-files/kmer/SM-7M8RR.kmertrim.fq.gz
+- data/intermediate-files/kmer/SM-9QMNE.kmertrim.fq.gz
+- data/intermediate-files/kmer/SM-9SIJC.kmertrim.fq.gz
+outdir: outputs.mgx_sub5
+metagenome_trim_memory: 1e9
+
+sourmash_databases:
+- gtdb-rs202.genomic-reps.k31.sbt.zip
