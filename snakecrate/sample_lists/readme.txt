@@ -9,7 +9,11 @@ Index for sample lists:
     - one participant: C3002
     - 19 samples
         -15 mgx
-        - 4 vrx
+        - 4 vrx 
+            - CSM5MCVN.tar				
+            - CSM67UBH.tar				
+            - CSM67UBN.tar				
+            - CSM79HJW.tar
 
 
 glossary:

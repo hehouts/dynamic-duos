@@ -1,0 +1,366 @@
+#--------------------------------------------------------------------------
+    #GENERATE SAMPLE LIST
+INPUT_DATA = "sample_lists/sub_1_mv.txt"
+SAMPLES = [x.strip().split(".tar")[0] for x in open(INPUT_DATA, 'r')]
+
+    #K SIZES
+K_SIZES = ["21","31","51"]
+
+    ###more realistic for prot:    
+PROT_K_SIZES = ["5","7","10"]
+
+    #SUBSAMPLE
+    ###takes first 3 samples
+SAMPLES = SAMPLES[:1]
+
+
+
+    #DEBUG PRINT
+#   print(samples)
+#--------------------------------------------------------------------------
+
+
+
+rule all:
+    input: 
+##   rule download_data
+        expand("data/raw_data/tars/{sample}.tar", sample = SAMPLES)
+#
+##   rule uncompress_genome
+#        expand("data/raw_data/bzips/{sample}_{ext}_sequence.txt.bz2", sample = SAMPLES, ext = ["1","2"])
+#
+##   rule bzip_to_gzip
+#        expand("raw_data/zipped_data/{sample}_{ext}.gz", sample = samples, ext = [1,2])
+#
+##   rule fastp
+#       expand("fastp/{sample}_{ext}.trimmed.fq.gz", sample=samples, ext = [1,2])
+#   rule remove_host (bbduk)
+#   !!!!! (requires precise resources to run: --mem=64G -n 4 )
+#        expand("bbduk/{sample}_{ext}.{org}.fq.gz", sample = samples, ext = ["1","2"], org = ["nohost","human"]),
+#
+##   rule khmer
+#        expand("kmer/{sample}.kmertrim.fq.gz", sample=samples)
+#
+#   rule sourmash_sketch (formerly sourmash_compute) 
+#        expand("sourmash/sig/{sample}_dna.sig", sample= samples)
+#
+#
+#
+# these might be useful later:
+#        #expand("sourmash/sig/{sample}_trn_prot.sig", sample=samples),
+#        #expand("sourmash/sig/{sample}_prot.sig", sample=samples),
+#        #expand("sourmash/compare/virHMP_compare_k{ksize}_unfiltered.csv", ksize=k_sizes),
+#        #expand("sourmash/gather/{sample}_gather.csv",sample=samples)
+#        #expand("sourmash/plots/virHMP_compare_k{ksize}_unfiltered.numpy.dendro.pdf", ksize=k_sizes),
+#        #expand("sourmash/plots/virHMP_compare_k{ksize}_unfiltered.numpy.hist.pdf", ksize=k_sizes),
+#        #expand("sourmash/plots/virHMP_compare_k{ksize}_unfiltered.numpy.matrix.pdf", ksize=k_sizes)
+#        #expand("{sample}_gather_unassigned.sig", sample= samples),
+
+
+#--------------------------------------------------------------------------
+
+#   #this web address no longer works
+rule download_data:
+    output: "data/raw_data/tars/{sample}.tar"
+    params: 
+        URL= lambda wildcards: "https://ibdmdb.org/tunnel/static/HMP2/WGS/1818/" + wildcards.sample + ".tar"
+#        URL= lambda wildcards: "https://ibdmdb.org/tunnel/static/HMP2/Viromics/1732/" + wildcards.sample + ".tar"
+    shell: """
+        wget -O {output} {params.URL}
+    """
+
+#rule uncompress_genome:
+#    input: "data/raw_data/tars/{sample}.tar"
+#    output: 
+#        "data/raw_data/bzips/{sample}_1_sequence.txt.bz2",
+#        "data/raw_data/bzips/{sample}_2_sequence.txt.bz2" 
+#    shell:
+#        "tar xvf {input} -C data/raw_data/bzips/"
+
+
+# rule bzip_to_gzip:
+#     input: 
+#         F1="raw_data/zipped_data/{sample}_1_sequence.txt.bz2",
+#         F2="raw_data/zipped_data/{sample}_2_sequence.txt.bz2"
+#     output:
+#         F1="raw_data/zipped_data/{sample}_1.gz", 
+#         F2="raw_data/zipped_data/{sample}_2.gz"
+#     log:
+#         "logs/gzip/{sample}_gzip.log"  
+#     benchmark:
+#         "logs/gzip/{sample}_gzip.benchmark"  
+#     resources:
+#         # minutes to allocate for sbatch in slurm
+#         runtime = 20,
+#         # memory to allocate in mb
+#         mem_mb = 1000
+#     threads: 1
+#     shell:
+#         """
+#         bzcat {input.F1} | gzip -c -9 > {output.F1} 2> {log}
+#         bzcat {input.F2} | gzip -c -9 > {output.F2} 2>> {log}
+#         """
+
+
+# rule fastp:
+#     input:
+#         R1="raw_data/zipped_data/{sample}_1.gz", 
+#         R2="raw_data/zipped_data/{sample}_2.gz"
+#     output:
+#         R1="fastp/{sample}_1.trimmed.fq.gz", 
+#         R2="fastp/{sample}_2.trimmed.fq.gz",
+#         html="fastp/{sample}_fastp.html",
+#         json="fastp/{sample}_fastp.json"
+#     log:
+#         "logs/fastp/{sample}_fastp.log"  
+#     benchmark:
+#         "logs/fastp/{sample}_fastp.benchmark"  
+#     conda:
+#         "virHMP_env.yml"
+#     shell:
+#         """
+#         fastp -i {input.R1} -I {input.R2}  \
+#         -o {output.R1} -O {output.R2} \
+#         -h {output.html} -j {output.json} > {log}
+#         """
+
+
+# rule remove_host:
+#     input:
+#         R1 = "fastp/{sample}_1.trimmed.fq.gz",
+#         R2 = "fastp/{sample}_2.trimmed.fq.gz",
+#         human = "../databases/hg19_main_mask_ribo_animal_allplant_allfungus.fa.gz"
+#     output:
+#         R1 = "bbduk/{sample}_1.nohost.fq.gz",
+#         R2 = "bbduk/{sample}_2.nohost.fq.gz",
+#         human_R1 = "bbduk/{sample}_1.human.fq.gz",
+#         human_R2 = "bbduk/{sample}_2.human.fq.gz"
+#     #bbduk requires 64gb of mem, and requires "-n 4" in srun command
+#     #^this didnt actually work, so I might need to req slightly more mem, ~65gb?
+#     #but first trying out resources and threads directive
+#     conda:
+#         "Envs/bbduk_env.yml"
+#     resources:
+#         mem_mb=64000
+#     threads:
+#         4
+#     log:
+#         "logs/bbduk/{sample}_bbduk.log"
+#     benchmark:
+#         "logs/bbduk/{sample}_bbduk.benchmark"
+#     shell:
+#         """
+#         bbduk.sh -Xmx64g t={threads}\
+#         in={input.R1} in2={input.R2}\
+#         out={output.R1} out2={output.R2}\
+#         outm={output.human_R1} outm2={output.human_R2}\
+#         k=31 ref={input.human}\
+#         > {log} 2>&1
+#         """
+
+
+# rule khmer: 
+#     input:
+#         R1="fastp/{sample}_1.trimmed.gz",
+#         R2="fastp/{sample}_2.trimmed.gz"
+#     output:
+#         "kmer/{sample}.kmertrim.fq.gz"
+#     conda:
+#         "Envs/khmer_env.yml"
+#     log:
+#         "logs/khmer/{sample}_khmer.log"
+#     shell:
+#         """
+#         interleave-reads.py {input.R1} {input.R2} | \
+#         trim-low-abund.py --gzip -C 3 -Z 18 -M 20e9 -V \
+#         - -o {output}\
+#         > {log} 2>&1
+#         """
+
+
+#---sourmash-sketch-----------------------------------------------------------------------
+
+#old rule sourmash_compute:
+#    input: "kmer/{sample}.kmertrim.fq.gz"
+#    output:
+#        "sourmash/sig/{sample}.sig"
+#    params:
+#        ksizes=",".join(k_sizes)
+#    log:
+#        "logs/sourmash/sig/{sample}_sig.log"
+#    benchmark:
+#        "logs/sourmash/sig/{sample}_sig.benchmark"
+#    conda
+#        "virHMP_env.yml"
+#    shell:"""
+#        sourmash compute -k {params.ksizes} --scaled 500 --merge {wildcards.sample}\
+#            --track-abundance -o {output} {input}"""
+
+
+
+#DNA
+#some python for making "-p" entry for sourmash 4.0 
+#from genome-grist:: make a `sourmash sketch` -p param string.
+# def make_param_str(ksizes, scaled):
+#     ks = [ f'k={k}' for k in ksizes ]
+#     ks = ",".join(ks)
+#     print(ks)
+#     return f"{ks},scaled={scaled},abund"
+    
+# rule sourmash_sketch_dna:
+#     input: "kmer/{sample}.kmertrim.fq.gz"
+#     output:
+#         "sourmash/sig/{sample}_dna.sig"
+#     params:
+#         smash_params= make_param_str(k_sizes, 100)
+#     log:
+#         "logs/sourmash/sig/{sample}_sig.log"
+#     benchmark:
+#         "logs/sourmash/sig/{sample}_sig.benchmark"
+#     conda:
+#         "Envs/sourmash_env.yml"
+#     shell:"""
+#         sourmash sketch dna \
+#         -p {params.smash_params} \
+#         --name {wildcards.sample} \
+#         -o {output} \
+#         {input} \
+#         > {log} 2>&1
+#     """
+
+
+#rule sourmash_sketch_translate:
+#    input: "kmer/{sample}.kmertrim.fq.gz"
+#    output:
+#        "sourmash/sig/{sample}_trns_prot.sig"
+#    params:
+#        ksizes=",".join(PROT_K_SIZES)
+#    log:
+#        "logs/sourmash/sig/{sample}_trns_prot_sig.log"
+#    benchmark:
+#        "logs/sourmash/sig/{sample}_trns_prot_sig.benchmark"
+#    conda:
+#        "virHMP_env.yml"
+#    #shell used to have "--merge {wildcards.sample}", but i dont remember what that does 
+#    #so I just took it out?
+#    shell:"""
+#        sourmash sketch translate \
+#        -k {params.ksizes}\
+#        --scaled 50\
+#        --track-abundance\
+#        -o {output}\
+#        {input}
+#    """
+
+# rule sourmash_sketch_translate:
+#     input: "kmer/{sample}.kmertrim.fq.gz"
+#     output:
+#         "sourmash/sig/{sample}_trns_prot.sig"
+#     params:
+#         smash_params= make_param_str(k_sizes, 100)
+#     log:
+#         "logs/sourmash/sig/{sample}_sig.log"
+#     benchmark:
+#         "logs/sourmash/sig/{sample}_sig.benchmark"
+#     conda:
+#         "Envs/sourmash_env.yml"
+#     shell:"""
+#         sourmash sketch dna \
+#         -p {params.smash_params} \
+#         --name {wildcards.sample} \
+#         -o {output} \
+#         {input} \
+#         > {log} 2>&1
+#     """
+
+
+
+#rule sourmash_sketch_protein:
+
+
+
+
+# rule sourmash_sketch_prot:
+#     input: "kmer/{sample}.kmertrim.fq.gz"
+#     output:
+#         "sourmash/sig/{sample}_trns_prot.sig"
+#     params:
+#         ksizes=",".join(PROT_K_SIZES)
+#     log:
+#         "logs/sourmash/sig/{sample}_trns_prot_sig.log"
+#     benchmark:
+#         "logs/sourmash/sig/{sample}_trns_prot_sig.benchmark"
+#     conda:
+#         "virHMP_env.yml"
+#     #shell used to have "--merge {wildcards.sample}", but i dont remember what that does 
+#     #so I just took it out?
+#     shell:"""
+#         sourmash sketch translate \
+#         -k {params.ksizes}\
+#         --scaled 50\
+#         --track-abundance\
+#         -o {output}\
+#         {input}
+#     """
+
+
+# rule sourmash_compare:
+#     input: expand("sourmash/sig/{sample}.sig", sample=samples)
+#     output:
+#         csv="sourmash/compare/virHMP_compare_k{ksize}_unfiltered.csv",
+#         numpy="sourmash/compare/virHMP_compare_k{ksize}_unfiltered.numpy"
+        
+#     shell:"""
+#         sourmash compare {input} -k {wildcards.ksize} -o {output.numpy} --csv {output.csv}
+#     """
+
+# ### add a sm plot rule, takes numpy output of ^ and makes a heatmap (pdf) ( sourmash plot --help)
+
+# rule sourmash_plot:
+# #    input: expand("sourmash/compare/virHMP_compare_k{ksize}_unfiltered.numpy", ksize=k_sizes)
+#     input: "sourmash/compare/virHMP_compare_k{ksize}_unfiltered.numpy"
+#     output:
+#         "sourmash/plots/virHMP_compare_k{ksize}_unfiltered.numpy.dendro.pdf",
+#         "sourmash/plots/virHMP_compare_k{ksize}_unfiltered.numpy.hist.pdf",
+#         "sourmash/plots/virHMP_compare_k{ksize}_unfiltered.numpy.matrix.pdf"
+
+#     shell:"""
+#         sourmash plot --pdf --labels {input} --output sourmash/plots/
+#     """
+
+# rule download_gather_genbank:
+#     output: "gather_databases/genbank-k31.sbt.zip"
+#     params:
+#         dl_link="https://osf.io/jgu93/download"
+#     shell:
+#         """
+#         wget -O {output} {params.dl_link}
+#         """
+
+# rule sourmash_gather:
+#     input:
+#         query="sourmash/sig/{sample}.sig",
+#         database="gather_databases/genbank-k31.sbt.zip"
+#     output:
+#         csv="sourmash/gather/{sample}_gather.csv",
+#         matches="{sample}_gather_matched.sig",
+        
+#         #unassigned is the one likely to only have viral sigs
+#         unassigned="{sample}_gather_unassigned.sig",
+#         report="sourmash/gather/{sample}_report.txt"
+#     log:
+#         "logs/sourmash/gather/{sample}_gather.log"
+#     benchmark:
+#         "logs/sourmash/gather/{sample}_gather.benchmark"
+#     conda:
+#         "virHMP_env.yml"
+#     shell:
+#         """
+#         sourmash gather {input.query} {input.database} -k 31 --threshold-bp=0 --scaled 2000 --save-matches {output.matches} --output-unassigned {output.unassigned} -o {output.csv} >& {output.report} 2> {log}
+#         """
+
+#rule sourmash_gather_pigeon_unassigned:
+    # same as sourmash_gather, but new database, and use prev smgather "unassigned" output as query
+
+#rule sourmash_gather_pigeon_unfiltered:
+    # same as sourmash_gather, but new database
