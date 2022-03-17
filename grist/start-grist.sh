@@ -1,1 +1,1 @@
-genome-grist run config-mgx-sub5.yml summarize_gather summarize_mapping
+genome-grist run config-3.yml summarize_gather summarize_mapping --latency-wait 30
