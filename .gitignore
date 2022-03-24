@@ -1,11 +1,22 @@
-raw_data/
+
+
+##### data #####
+*.gz
+*.tar
+
+
+##### Snakemake #####
+*.log
+*.benchmark
+*.snakemake
+
+
+##### R #####
 .DS_Store
 .RData
 .Rhistory
-2020-work/
-snakecrate/data/
 
-*.gz
-*.log
-*.benchmark
+
+##### other #####
+2020-work/
 
