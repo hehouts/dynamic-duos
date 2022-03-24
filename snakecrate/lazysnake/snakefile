@@ -1,45 +1,20 @@
-LINKS = ["https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/CSM67UBN.tar",
-    "https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/CSM5FZ3X_P.fastq.gz",
-    "https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/CSM5MCVL.tar",
-    "https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/CSM5FZ3Z_P.fastq.gz",
-    "https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/CSM5MCVN.tar",
-    "https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/CSM5FZ46_P.fastq.gz",
-    "https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/CSM79HJY.tar",
-    "https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/CSM67UBH.tar",
-    "https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/CSM79HJW.tar",
-    "https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/CSM5FZ42_P.fastq.gz",
-    "https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/CSM5FZ44_P.fastq.gz",
-    "https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/CSM67UBF.tar",
-    "https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/CSM5MCVJ_P.fastq.gz",
-    "https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/CSM67UBR.tar",
-    "https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/CSM5FZ3T_P.fastq.gz"]
-
-FILES = ["CSM67UBN.tar",
-    "CSM5FZ3X_P.fastq.gz",
-    "CSM5MCVL.tar",
-    "CSM5FZ3Z_P.fastq.gz",
-    "CSM5MCVN.tar",
-    "CSM5FZ46_P.fastq.gz",
-    "CSM79HJY.tar",
-    "CSM67UBH.tar",
-    "CSM79HJW.tar",
-    "CSM5FZ42_P.fastq.gz",
-    "CSM5FZ44_P.fastq.gz",
-    "CSM67UBF.tar",
-    "CSM5MCVJ_P.fastq.gz",
-    "CSM67UBR.tar",
-    "CSM5FZ3T_P.fastq.gz"]
-
-rule all:
-    input: FILES
-
-rule download_data:
-    output: "{FILES}"
-    params: 
-        URL= lambda wildcards: "https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/" + wildcards.FILES
-#        URL= lambda wildcards: "https://ibdmdb.org/tunnel/static/HMP2/Viromics/1732/" + wildcards.sample + ".tar"
-    shell: """
-        wget -O {output} {params.URL}
-    """
 
 
+
+#samples= [x.strip().split("_")[0] for x in open("external_IDs.txt")]            
+
+samples = ['CSM79HKT', 'CSM79HQF']
+
+rule all:                                                                                                
+    input:                                                                                               
+            expand("test/c3008/{sample}.tar", sample = samples)                                
+                                                                                                         
+rule download:                                                                                           
+    output: "test/c3008/{sample}.tar"                                                          
+    params: URL= lambda wildcards: "https://ibdmdb.org/tunnel/static/HMP2/WGS/1818/" + wildcards.sample + ".tar"                                                                                                  
+    shell: "wget -O {output} {params.URL}"                                                               
+                                                                                                         
+rule unzip:                                                                                              
+    input: "test/c3008/{sample}.tar"                                                           
+    output: "test/c3008/{sample}.tar"                                                                      
+    shell: "tar -xvf {input} --directory {output}" 

@@ -5,15 +5,12 @@ Index for sample lists:
     - all the viromic samples
     - 700?
 
--sub_1_mv
+- C3002_mgx.txt
     - one participant: C3002
-    - 19 samples
         -15 mgx
-        - 4 vrx 
-            - CSM5MCVN.tar				
-            - CSM67UBH.tar				
-            - CSM67UBN.tar				
-            - CSM79HJW.tar
+- C3002_vrx.txt
+    - one participant: C3002
+        -4 vrx 
 
 
 glossary:

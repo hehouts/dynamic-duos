@@ -9,38 +9,51 @@
                                                                                                      
                                                                                                     
                                
-# █████ set variables ██████
+# ███ set variables ███
 
-FILES = ["CSM67UBN.tar",
-    "CSM5FZ3X_P.fastq.gz",
-    "CSM5MCVL.tar",
-    "CSM5FZ3Z_P.fastq.gz",
-    "CSM5MCVN.tar",
-    "CSM5FZ46_P.fastq.gz",
-    "CSM79HJY.tar",
-    "CSM67UBH.tar",
-    "CSM79HJW.tar",
-    "CSM5FZ42_P.fastq.gz",
-    "CSM5FZ44_P.fastq.gz",
-    "CSM67UBF.tar",
-    "CSM5MCVJ_P.fastq.gz",
-    "CSM67UBR.tar",
-    "CSM5FZ3T_P.fastq.gz"]
+INPUT_DATA = "sample_lists/C3002_mgx.txt"
+
+#   #generate sample list from file names text file
+FILES = [x.strip().split("\n")[0] for x in open(INPUT_DATA, 'r')]
+
+#SAMPLES = [x.strip().split(".tar")[0] for x in open(INPUT_DATA, 'r')]
+#SAMPLES = [x.strip().split(".fastq.gz")[0] for x in SAMPLES]
+# ██ SUBSAMPLE ██
+#SAMPLES = SAMPLES[:1]
 
 
-  #GENERATE SAMPLE LIST
-INPUT_DATA = "sample_lists/sub_1_mv.txt"
-SAMPLES = [x.strip().split(".tar")[0] for x in open(INPUT_DATA, 'r')]
-
-    #K SIZES
+# ██ K SIZES ██
 K_SIZES = ["21","31","51"]
-
-    ###more realistic for prot:    
 PROT_K_SIZES = ["5","7","10"]
 
-    #SUBSAMPLE
-    ###takes first 3 samples
-SAMPLES = SAMPLES[:1]
 
-#█████ set variables ███████████████
 
+
+# ██████████ RULE ALL ██████████
+rule all: 
+    input: 
+##   rule download_data
+#        expand("raw_data/zipped_data/{file}", file = FILES)
+
+##   rule uncompress_genome:
+        expand("raw_data/zipped_data/{sample}_{ext}.bz2", sample =samples, ext = [1,2])
+        #expand("raw_data/zipped_data/{sample}_1_sequence.txt.bz2", sample =samples),
+        "data/raw_data/{FILES}",
+
+# ██████████ RULES ██████████
+#rule download_data: 
+#    output: "data/raw_data/{FILES}"
+
+
+
+# this rule could go through and append MGX or MVX to each file name, btw
+rule uncompress_genome:
+    output: 
+    "data/zips/bzips/{sample}_1_sequence.txt.bz2",
+    "data/zips/bzips/{sample}_2_sequence.txt.bz2" 
+    input: "data/raw_data/tars/{FILES}"
+    output: 
+        "data/raw_data/bzips/{sample}_1_sequence.txt.bz2",
+        "data/raw_data/bzips/{sample}_2_sequence.txt.bz2" 
+    shell:
+        "tar xvf {input} -C data/raw_data/bzips/"
