@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_004101765.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/004/101/765/GCA_004101765.1_ASM410176v1/GCA_004101765.1_ASM410176v1_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/004/101/765/GCA_004101765.1_ASM410176v1/GCA_004101765.1_ASM410176v1_assembly_report.txt,Akkermansia muciniphila

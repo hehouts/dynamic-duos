@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_003463485.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/003/463/485/GCA_003463485.1_ASM346348v1/GCA_003463485.1_ASM346348v1_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/003/463/485/GCA_003463485.1_ASM346348v1/GCA_003463485.1_ASM346348v1_assembly_report.txt,[Clostridium] symbiosum

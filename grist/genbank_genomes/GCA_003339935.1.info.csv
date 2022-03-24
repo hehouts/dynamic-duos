@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_003339935.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/003/339/935/GCA_003339935.1_ASM333993v1/GCA_003339935.1_ASM333993v1_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/003/339/935/GCA_003339935.1_ASM333993v1/GCA_003339935.1_ASM333993v1_assembly_report.txt,Eggerthella lenta

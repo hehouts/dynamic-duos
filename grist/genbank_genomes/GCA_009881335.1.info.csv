@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_009881335.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/009/881/335/GCA_009881335.1_ASM988133v1/GCA_009881335.1_ASM988133v1_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/009/881/335/GCA_009881335.1_ASM988133v1/GCA_009881335.1_ASM988133v1_assembly_report.txt,Blautia wexlerae

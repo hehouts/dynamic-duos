@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_900291485.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/900/291/485/GCA_900291485.1_R_bromii_L2_63_validated_080218.embl.gz/GCA_900291485.1_R_bromii_L2_63_validated_080218.embl.gz_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/900/291/485/GCA_900291485.1_R_bromii_L2_63_validated_080218.embl.gz/GCA_900291485.1_R_bromii_L2_63_validated_080218.embl.gz_assembly_report.txt,Ruminococcus bromii L2-63

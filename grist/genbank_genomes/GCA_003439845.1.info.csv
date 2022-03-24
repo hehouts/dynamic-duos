@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_003439845.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/003/439/845/GCA_003439845.1_ASM343984v1/GCA_003439845.1_ASM343984v1_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/003/439/845/GCA_003439845.1_ASM343984v1/GCA_003439845.1_ASM343984v1_assembly_report.txt,Bacteroides thetaiotaomicron

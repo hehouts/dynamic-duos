@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_000963415.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/963/415/GCA_000963415.1_ASM96341v1/GCA_000963415.1_ASM96341v1_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/963/415/GCA_000963415.1_ASM96341v1/GCA_000963415.1_ASM96341v1_assembly_report.txt,Blastocystis sp. subtype 6

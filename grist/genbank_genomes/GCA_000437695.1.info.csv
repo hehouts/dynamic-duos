@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_000437695.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/437/695/GCA_000437695.1_MGS321/GCA_000437695.1_MGS321_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/437/695/GCA_000437695.1_MGS321/GCA_000437695.1_MGS321_assembly_report.txt,Firmicutes bacterium CAG:321

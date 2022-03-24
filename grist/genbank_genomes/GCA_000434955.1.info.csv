@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_000434955.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/434/955/GCA_000434955.1_MGS65/GCA_000434955.1_MGS65_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/434/955/GCA_000434955.1_MGS65/GCA_000434955.1_MGS65_assembly_report.txt,Firmicutes bacterium CAG:65

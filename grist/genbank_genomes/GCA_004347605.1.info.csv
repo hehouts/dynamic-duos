@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_004347605.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/004/347/605/GCA_004347605.1_ASM434760v1/GCA_004347605.1_ASM434760v1_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/004/347/605/GCA_004347605.1_ASM434760v1/GCA_004347605.1_ASM434760v1_assembly_report.txt,Phocaeicola dorei

@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_000297755.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/297/755/GCA_000297755.1_Bact_frag_HMW_616_V1/GCA_000297755.1_Bact_frag_HMW_616_V1_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/297/755/GCA_000297755.1_Bact_frag_HMW_616_V1/GCA_000297755.1_Bact_frag_HMW_616_V1_assembly_report.txt,Bacteroides fragilis HMW 616

@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_001881165.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/881/165/GCA_001881165.1_ASM188116v1/GCA_001881165.1_ASM188116v1_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/881/165/GCA_001881165.1_ASM188116v1/GCA_001881165.1_ASM188116v1_assembly_report.txt,Escherichia coli

@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_000433955.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/433/955/GCA_000433955.1_MGS48/GCA_000433955.1_MGS48_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/433/955/GCA_000433955.1_MGS48/GCA_000433955.1_MGS48_assembly_report.txt,Parabacteroides merdae CAG:48

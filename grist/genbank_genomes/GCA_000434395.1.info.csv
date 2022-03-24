@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_000434395.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/434/395/GCA_000434395.1_MGS568/GCA_000434395.1_MGS568_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/434/395/GCA_000434395.1_MGS568/GCA_000434395.1_MGS568_assembly_report.txt,Clostridium sp. CAG:568

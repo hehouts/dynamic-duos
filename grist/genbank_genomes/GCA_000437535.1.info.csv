@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_000437535.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/437/535/GCA_000437535.1_MGS629/GCA_000437535.1_MGS629_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/437/535/GCA_000437535.1_MGS629/GCA_000437535.1_MGS629_assembly_report.txt,Prevotella stercorea CAG:629

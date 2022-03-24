@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_000435775.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/435/775/GCA_000435775.1_MGS270/GCA_000435775.1_MGS270_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/435/775/GCA_000435775.1_MGS270/GCA_000435775.1_MGS270_assembly_report.txt,Firmicutes bacterium CAG:270

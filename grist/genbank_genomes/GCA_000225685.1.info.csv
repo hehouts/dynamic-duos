@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_000225685.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/225/685/GCA_000225685.1_Erys_bact_2_2_44A_V1/GCA_000225685.1_Erys_bact_2_2_44A_V1_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/225/685/GCA_000225685.1_Erys_bact_2_2_44A_V1/GCA_000225685.1_Erys_bact_2_2_44A_V1_assembly_report.txt,Erysipelotrichaceae bacterium 2_2_44A

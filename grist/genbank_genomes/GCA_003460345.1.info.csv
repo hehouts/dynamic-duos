@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_003460345.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/003/460/345/GCA_003460345.1_ASM346034v1/GCA_003460345.1_ASM346034v1_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/003/460/345/GCA_003460345.1_ASM346034v1/GCA_003460345.1_ASM346034v1_assembly_report.txt,Bacteroides eggerthii

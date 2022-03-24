@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_000433315.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/433/315/GCA_000433315.1_MGS345/GCA_000433315.1_MGS345_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/433/315/GCA_000433315.1_MGS345/GCA_000433315.1_MGS345_assembly_report.txt,Firmicutes bacterium CAG:345

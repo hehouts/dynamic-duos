@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_000437595.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/437/595/GCA_000437595.1_MGS74/GCA_000437595.1_MGS74_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/437/595/GCA_000437595.1_MGS74/GCA_000437595.1_MGS74_assembly_report.txt,Faecalibacterium sp. CAG:74

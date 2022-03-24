@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_000433375.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/433/375/GCA_000433375.1_MGS32/GCA_000433375.1_MGS32_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/433/375/GCA_000433375.1_MGS32/GCA_000433375.1_MGS32_assembly_report.txt,Bacteroides faecis CAG:32

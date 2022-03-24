@@ -3,7 +3,8 @@
 ##### data #####
 *.gz
 *.tar
-
+*.zip
+*.sbt
 
 ##### Snakemake #####
 *.log

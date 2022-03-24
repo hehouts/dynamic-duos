@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_000434815.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/434/815/GCA_000434815.1_MGS139/GCA_000434815.1_MGS139_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/434/815/GCA_000434815.1_MGS139/GCA_000434815.1_MGS139_assembly_report.txt,Proteobacteria bacterium CAG:139

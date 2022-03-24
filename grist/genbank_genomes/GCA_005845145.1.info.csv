@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_005845145.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/005/845/145/GCA_005845145.1_ASM584514v1/GCA_005845145.1_ASM584514v1_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/005/845/145/GCA_005845145.1_ASM584514v1/GCA_005845145.1_ASM584514v1_assembly_report.txt,Bacteroides ovatus

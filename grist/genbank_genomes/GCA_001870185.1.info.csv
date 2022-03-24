@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_001870185.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/870/185/GCA_001870185.1_ASM187018v1/GCA_001870185.1_ASM187018v1_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/870/185/GCA_001870185.1_ASM187018v1/GCA_001870185.1_ASM187018v1_assembly_report.txt,Klebsiella oxytoca

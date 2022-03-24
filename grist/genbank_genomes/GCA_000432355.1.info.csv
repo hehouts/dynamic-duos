@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_000432355.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/432/355/GCA_000432355.1_MGS161/GCA_000432355.1_MGS161_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/432/355/GCA_000432355.1_MGS161/GCA_000432355.1_MGS161_assembly_report.txt,Eubacterium sp. CAG:161

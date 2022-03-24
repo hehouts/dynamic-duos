@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_000433115.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/433/115/GCA_000433115.1_MGS382/GCA_000433115.1_MGS382_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/433/115/GCA_000433115.1_MGS382/GCA_000433115.1_MGS382_assembly_report.txt,Ruminococcus sp. CAG:382

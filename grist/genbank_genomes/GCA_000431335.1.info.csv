@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_000431335.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/431/335/GCA_000431335.1_MGS343/GCA_000431335.1_MGS343_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/431/335/GCA_000431335.1_MGS343/GCA_000431335.1_MGS343_assembly_report.txt,Clostridium sp. CAG:343

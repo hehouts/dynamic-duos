@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_003433855.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/003/433/855/GCA_003433855.1_ASM343385v1/GCA_003433855.1_ASM343385v1_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/003/433/855/GCA_003433855.1_ASM343385v1/GCA_003433855.1_ASM343385v1_assembly_report.txt,Coprococcus catus
