@@ -503,18 +503,25 @@ full_file_manifest
 ```
 
 lets try merging `full_file_manifest` with `ihmp_metadata` on `ihmp_sample_id`
-
+*lol it didnt work
 
 ```r
-ihmp <- readr::read_csv("paired_mgx_vrx_ihmp_metadata.csv")%>% 
+ihmp <- readr::read_csv("../ibdmdb_relevant_participantIDs_and_sampleIDs/paired_mgx_vrx_ihmp_metadata.csv")%>% 
   rename("ihmp_sample_id" = external_id)
 ```
 
 ```
-## Rows: 0 Columns: 490
+## Warning: One or more parsing issues, see `problems()` for details
+```
+
+```
+## Rows: 2299 Columns: 490
 ## ── Column specification ────────────────────────────────────────────────────────
 ## Delimiter: ","
-## chr (490): project, external_id, participant_id, site_sub_coll, data_type, w...
+## chr  (145): project, external_id, participant_id, site_sub_coll, data_type, ...
+## dbl   (20): week_num, interval_days, visit_num, gssr_i_ds, wr_id, number_lan...
+## lgl  (324): reads_ribosomal, delta, has_the_subject_had_a_cholecystectomy, h...
+## date   (1): date_of_receipt
 ## 
 ## ℹ Use `spec()` to retrieve the full column specification for this data.
 ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
@@ -531,7 +538,7 @@ nrow(ihmp)
 ```
 
 ```
-## [1] 0
+## [1] 2299
 ```
 
 ```r
@@ -547,7 +554,7 @@ n_distinct(ihmp$ihmp_sample_id)
 ```
 
 ```
-## [1] 0
+## [1] 1614
 ```
 
 ```r
@@ -558,23 +565,12 @@ n_distinct(full_file_manifest$ihmp_sample_id)
 ## [1] 1656
 ```
 
-```r
-571*2
-```
-
-```
-## [1] 1142
-```
-
 
 
 ```r
 df <- left_join(ihmp, full_file_manifest, "ihmp_sample_id")
 #right_join(ihmp, full_file_manifest, "ihmp_sample_id")
 ```
-
-
-
 
 
 ```r
@@ -654,9 +650,80 @@ sra_mani
 #ihmp_sample_id, experiment_accession, study_accession, sample_accession, library_name
 #names(df)
 
-trim_df <- df %>% select(ihmp_sample_id, participant_id, data_type, week_num, interval_days, project)
+trim_df <- df %>% select(ihmp_sample_id, participant_id, data_type, week_num, interval_days, project) %>% arrange(participant_id, data_type, week_num)
 
-trim_sra <- sra_mani %>% select(ihmp_sample_id, experiment_accession, study_accession, sample_accession, library_name)
+trim_sra <- sra_mani %>% select(ihmp_sample_id, experiment_accession, study_accession, sample_accession, library_name) %>% arrange(ihmp_sample_id)
+
+trim_df
+```
+
+```
+## # A tibble: 3,669 × 6
+##    ihmp_sample_id participant_id data_type    week_num interval_days project
+##    <chr>          <chr>          <chr>           <dbl>         <dbl> <chr>  
+##  1 CSM5FZ3N_P     C3001          metagenomics        0             0 G79889 
+##  2 CSM5FZ3R_P     C3001          metagenomics        2            14 G79894 
+##  3 CSM5YRY7_P     C3001          metagenomics        4            18 G79903 
+##  4 CSM5FZ3V_P     C3001          metagenomics        6            13 G79913 
+##  5 CSM5FZ4C_P     C3001          metagenomics        8            11 G79926 
+##  6 CSM5MCVD_P     C3001          metagenomics       12            20 G79969 
+##  7 CSM5MCVF_P     C3001          metagenomics       14            15 G80015 
+##  8 CSM5MCVV_P     C3001          metagenomics       16            15 G79979 
+##  9 CSM5MCWI_P     C3001          metagenomics       18            12 G80050 
+## 10 CSM5MCXD       C3001          metagenomics       20            14 G110156
+## # … with 3,659 more rows
+```
+
+```r
+trim_sra
+```
+
+```
+## # A tibble: 378 × 5
+##    ihmp_sample_id experiment_acce… study_accession sample_accession library_name
+##    <chr>          <chr>            <chr>           <chr>            <chr>       
+##  1 C3001C1        SRX3139291       SRP115812       SRS2472163       G79889_MGX  
+##  2 C3001C10       SRX3106607       SRP115812       SRS2441858       G80053_MGX  
+##  3 C3001C10_MTX   SRX3106690       SRP115812       SRS2441941       G89370_MTX  
+##  4 C3001C2        SRX3139294       SRP115812       SRS2472166       G79894_MGX  
+##  5 C3001C3        SRX3139288       SRP115812       SRS2472160       G79903_MGX  
+##  6 C3001C4        SRX3139289       SRP115812       SRS2472161       G79913_MGX  
+##  7 C3001C5        SRX3106633       SRP115812       SRS2441884       G79931_MGX  
+##  8 C3001C5_MTX    SRX3106735       SRP115812       SRS2441986       G89308_MTX  
+##  9 C3001C7        SRX3139397       SRP115812       SRS2472234       G79969_MGX  
+## 10 C3001C8        SRX3139360       SRP115812       SRS2472871       G80015_MGX  
+## # … with 368 more rows
+```
+
+```r
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("sradb")
+```
+
+```
+## Bioconductor version 3.14 (BiocManager 1.30.16), R 4.1.2 (2021-11-01)
+```
+
+```
+## Installing package(s) 'sradb'
+```
+
+```
+## Warning in .inet_warning(msg): package 'sradb' is not available for Bioconductor version '3.14'
+## 
+## A version of this package for your version of R might be available elsewhere,
+## see the ideas at
+## https://cran.r-project.org/doc/manuals/r-patched/R-admin.html#Installing-packages
+```
+
+```
+## Warning in .inet_warning(msg): Perhaps you meant 'SRAdb' ?
+```
+
+```
+## Old packages: 'admisc', 'commonmark', 'desc', 'maptools', 'openssl', 'Rcpp',
+##   'rlang', 'rmarkdown', 'sf'
 ```
 
 
@@ -669,7 +736,7 @@ inner_join(trim_sra, trim_df, "ihmp_sample_id")# %>%
 ## # A tibble: 0 × 10
 ## # … with 10 variables: ihmp_sample_id <chr>, experiment_accession <chr>,
 ## #   study_accession <chr>, sample_accession <chr>, library_name <chr>,
-## #   participant_id <chr>, data_type <chr>, week_num <chr>, interval_days <chr>,
+## #   participant_id <chr>, data_type <chr>, week_num <dbl>, interval_days <dbl>,
 ## #   project <chr>
 ```
 
@@ -681,10 +748,93 @@ inner_join(trim_sra, trim_df, "ihmp_sample_id")# %>%
 
 
 
+### dear god, I guess I need software now
 
 
+somehow, this installed  [sradb](https://www.bioconductor.org/packages/release/bioc/html/SRAdb.html) (repo [here](https://github.com/ncbi/sra-tools)) 
 
+```r
+#if (!require("BiocManager", quietly = TRUE))
+#    install.packages("BiocManager")
+#
+#BiocManager::install("SRAdb")
 
+library("SRAdb")
+```
+
+```
+## Loading required package: RSQLite
+```
+
+```
+## Loading required package: graph
+```
+
+```
+## Loading required package: BiocGenerics
+```
+
+```
+## 
+## Attaching package: 'BiocGenerics'
+```
+
+```
+## The following objects are masked from 'package:dplyr':
+## 
+##     combine, intersect, setdiff, union
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     IQR, mad, sd, var, xtabs
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     anyDuplicated, append, as.data.frame, basename, cbind, colnames,
+##     dirname, do.call, duplicated, eval, evalq, Filter, Find, get, grep,
+##     grepl, intersect, is.unsorted, lapply, Map, mapply, match, mget,
+##     order, paste, pmax, pmax.int, pmin, pmin.int, Position, rank,
+##     rbind, Reduce, rownames, sapply, setdiff, sort, table, tapply,
+##     union, unique, unsplit, which.max, which.min
+```
+
+```
+## 
+## Attaching package: 'graph'
+```
+
+```
+## The following object is masked from 'package:stringr':
+## 
+##     boundary
+```
+
+```
+## Loading required package: RCurl
+```
+
+```
+## 
+## Attaching package: 'RCurl'
+```
+
+```
+## The following object is masked from 'package:tidyr':
+## 
+##     complete
+```
+
+```
+## Setting options('download.file.method.GEOquery'='auto')
+```
+
+```
+## Setting options('GEOquery.inmemory.gpl'=FALSE)
+```
 
 
 

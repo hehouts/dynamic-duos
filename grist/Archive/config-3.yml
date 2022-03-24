@@ -1,0 +1,11 @@
+samples:
+- SRR6704238
+- SRR6704239
+- SRR6704240
+outdir: outputs.sub3
+metagenome_trim_memory: 1e9
+
+sourmash_databases:
+- gtdb-rs202.genomic-reps.k31.sbt.zip
+
+

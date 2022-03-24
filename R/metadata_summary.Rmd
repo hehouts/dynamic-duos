@@ -1,0 +1,244 @@
+---
+title: "Metadata Summary"
+output: html_document
+date: '2022-03-16'
+---
+
+### Definitions 
+MVX - viromics, Viral fraction
+MGX - metagenomic, Bulk fraction
+
+
+### Chunk 1 - Load Libraries and Data 
+```{r, warning=FALSE}
+library(tidyverse)
+library(janitor)
+library(naniar)
+#setwd("/Users/hehouts/projects/dynamic-duos/R")
+ibdmdb <- clean_names(readr::read_csv("csvs_and_other_metadata/ihmp_metadata.csv", show_col_types = F))
+ibdmdb <- ibdmdb %>% 
+  filter(data_type == "metagenomics" | data_type == "viromics") %>% 
+  arrange(participant_id, data_type, week_num)
+```
+
+
+### Chunk 2 - Determine Number of Metagenome and Viromes Samples
+2341 Metagenome + Virome samples
+```{r}
+# 2341 total samples, mgx + mvx
+ibdmdb <- ibdmdb %>% 
+  filter(data_type == "metagenomics" | data_type == "viromics") %>% 
+  arrange(participant_id, data_type, week_num)
+
+# 1638 MGX samples
+ibdmdb_mgx_only <- ibdmdb %>% 
+  filter(data_type == "metagenomics") %>% 
+  arrange(participant_id, week_num)
+
+# 703 MVX samples
+ibdmdb_mvx_only <- ibdmdb %>% 
+  filter(data_type == "viromics") %>% 
+  arrange(participant_id, week_num)
+
+# hard saved csv of all mgx & vrx samples in the ibdmdb, no other 'omics. should be 2341 long. 
+write_csv(ibdmdb, "csvs_and_other_metadata/ibdmdb_metadata_2341.csv")
+```
+
+### Chunk 3 - Determine Number of paired MGX and MVX Samples, and Determine Which Have Antibiotic Data
+
+Determine Number of PAIRED MGX and MVX Samples
+
+- 130 total participants
+- 105 participants have virome samples
+  - 2299 samples are from those 105 participants
+- 34 participants that have viromes samples, and had antibiotics
+  - 838 samples are from those 34 participants
+
+```{r}
+
+# 130 total participants
+ibdmdb %>% distinct(participant_id)
+
+# 105 participant ids of ONLY participants that have vrx samples, regardless of antibiotic status, i.e. "pair" participants
+pair_ids_vec <- ibdmdb %>% 
+  select(data_type, participant_id) %>% 
+  filter(data_type == "viromics") %>% 
+  distinct(participant_id) %>% 
+  pull(participant_id)
+
+# 2299 samples from just the 105 "pair" participants
+pairs_df <- ibdmdb %>% 
+  filter(data_type == "metagenomics" | data_type == "viromics") %>% 
+  filter(participant_id %in% pair_ids_vec) %>%
+  arrange(participant_id, data_type, week_num)
+write_csv(pairs_df, "csvs_and_other_metadata/ihmp_metadata_2299_paired_mgx_vrx.csv")
+
+
+### Antibiotics:
+
+# 34 participant ids of ONLY participants that have vrx samples, and had antibiotics, i.e. "abxpair", "relevant participants"
+abx_pair_ids_vec <- ibdmdb %>% 
+  select(data_type, participant_id, antibiotics) %>% 
+  filter(data_type == "viromics" & antibiotics=="Yes") %>%
+  distinct(participant_id) %>% 
+  pull(participant_id)
+
+
+# 838 samples from just the 34 "abxpair" participants,
+abx_pairs_df <- ibdmdb %>% 
+  filter(data_type == "metagenomics" | data_type == "viromics") %>% 
+  filter(participant_id %in% abx_pair_ids_vec) %>%
+  arrange(participant_id, data_type, week_num)
+write_csv(abx_pairs_df, "csvs_and_other_metadata/ihmp_metadata_838_antibiotics_paired_mgx_vrx.csv")
+
+```
+
+
+
+
+
+
+
+
+### Chunk 4
+
+### Chunk
+Read in SRA results:
+
+```{r}
+sra <- clean_names(readr::read_csv("csvs_and_other_metadata/sra_result2979.csv"))
+sra <- sra %>% 
+  filter(organism_name == "human gut metagenome" | organism_name == "viral metagenome") %>% 
+  filter(library_strategy == "WGS") %>% 
+  relocate(sample_accession, library_name, organism_name, experiment_title) %>% 
+  arrange(desc(organism_name))
+
+ihmp_sras <- sra %>% select(sample_accession)
+write_csv(ihmp_sras, "csvs_and_other_metadata/sras_mgx_vrx_2041.csv")
+
+head(sra)
+sra_cols<- names(sra)
+```
+
+
+
+
+
+
+
+does `all_samples$external_id` merge on a trimmed down `sra$library_name`!?!?!
+
+```{r}
+# sum_all_samples <- all_samples %>% select(project, participant_id, week_num, data_type, site_sub_coll, external_id)
+
+
+
+sra_mod <- sra %>% 
+  separate(library_name, into = c("library_name", NA), sep = "_MGX", remove = T) %>% 
+  separate(library_name, into = c("library_name", NA), sep = "_MVX", remove = T)
+sra_mod
+
+sra_mgx <- sra %>% 
+  filter(organism_name == "human gut metagenome")
+  
+    
+
+
+### use a split sra$experiment_title and ihmp$external_id to 
+sra_test <- sra_mgx %>% 
+  separate(experiment_title, into = c("key", NA), sep = " stool")
+
+#ihmp_mod <- all_samples %>% 
+#  select(project, participant_id, week_num, data_type, site_sub_coll, external_id) %>% 
+#  separate(project, into = c("project", NA), sep = "_MGX", remove = T)%>% 
+#  separate(project, into = c("project", NA), sep = "_MVX", remove = T)
+
+ihmp_mod <- abx_pairs_df %>% 
+  select(project, participant_id, week_num, data_type, site_sub_coll, external_id) %>% 
+  separate(project, into = c("project", NA), sep = "_MGX", remove = T)%>% 
+  separate(project, into = c("project", NA), sep = "_MVX", remove = T)
+
+
+
+
+ihmp_mod_2 <- ihmp_mod %>% 
+  separate(external_id, into = c(external_id_trim,""), sep = "",remove = T)
+
+
+
+  
+left_join(ihmp_mod, sra_mod, by = c("project" = "library_name")) %>%
+  drop_na(sample_accession) %>% 
+  relocate(sample_accession, project, organism_name, experiment_title)
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+
+###Supplementary chunks
+#### Chunk s1
+```{r}
+#### Here I am frantically looking for the column that its matching on 76C9Y, with external_id HSM6XRR7
+
+# reducing the number of columns to char columns, gets down to ~300 from ~500 
+df <- ibdmdb_mvx_only %>% 
+  filter(external_id == "HSM6XRR7") %>% 
+  select(where(is.character))
+
+
+df2 <- df[!map_lgl(df, ~ all(is.na(.)))]
+df2
+
+# df2 only has 131 columns, so I just clicked through them. found:
+
+#`tube_a_viromics`!!!! 
+#which matches the exact virome file name: SM-76C9Y
+
+
+# looking at these "tube" columns is proabably going to be important later, hard listed below 
+#names(
+  ibdmdb %>% 
+  select(contains("tube")) %>% 
+  select(where(is.character)) %>% 
+  drop_na()
+#)
+```
+```
+"serum_tube_number_1_received_at_csmc"
+"serum_tubes_number_2_4_received_at_mgh"
+"tube_a_dna_rna""tube_a_metabolomics"
+"tube_a_storage"
+"tube_a_viromics"
+"tube_b_fecal_calprotectin"
+"tube_b_proteomics"
+"stool_sample_id_tube_a_et_oh"
+"sample_id_tube_b_no_preservative"
+"tube_a_and_b_received_at_broad"    
+```
+#### Chunk s2
+
+
+### Chuck- 
+
+does `all_samples$project` merge on `sra$library_name`!?!?! only on viromes
+
+```{r}
+
+
+sum_all_samples <- all_samples %>% select(project, participant_id, week_num, data_type, site_sub_coll, external_id)
+
+left_join(sum_all_samples, sra, by = c("project" = "library_name")) %>%
+  drop_na(sample_accession) %>% 
+  relocate(sample_accession, project, organism_name, experiment_title)
+#%>% 
+#  pull()
+
+
+
+```

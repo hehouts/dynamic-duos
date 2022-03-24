@@ -1,0 +1,102 @@
+---
+title: "Stripping Metagenome Data Download links"
+output: html_document
+date: '2022-03-15'
+---
+
+
+## Background:
+
+The ibdmdb website was broken-ish -- not allowing downloads of metagenome data directly giving a 404
+ftp wasnt working (could have been me, but tried some google and just kept getting access denied)
+
+```{r}
+library(tidyverse)
+```
+
+
+This is all but 1 (oops) link for metagenomes
+```{r}
+links <- read_csv("Desktop/ihmp_ibd_mgx_links.csv", col_names = F) %>% rename(link=X1)
+```
+
+```{r}
+
+my_samps_vec <- c(
+  "CSM5FZ3T_P",		
+  "CSM5FZ3X_P",		
+  "CSM5FZ3Z_P",		
+  "CSM5FZ42_P",		
+  "CSM5FZ44_P",		
+  "CSM5FZ46_P",		
+  "CSM5MCVJ_P",		
+  "CSM5MCVL",
+  "CSM5MCVN",
+  "CSM67UBF",
+  "CSM67UBH",		
+  "CSM67UBN",		
+  "CSM67UBR",		
+  "CSM79HJW",		
+  "CSM79HJY")
+
+my_links <- links %>% 
+    separate(link,
+           into = c(NA, "file"),
+           sep = "/raw/", remove = F
+           )%>%
+  separate(link,
+           into = c(NA, "ihmp_sample_id", NA),
+           sep = "/raw/|.tar|.fastq.gz", remove = F
+           )%>%
+  filter(ihmp_sample_id %in% my_samps_vec) %>% 
+  select(file) %>% 
+  distinct()
+
+print(head(my_links, 15))
+```
+
+
+
+
+
+```
+["https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/CSM67UBN.tar",
+"https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/CSM5FZ3X_P.fastq.gz",
+"https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/CSM5MCVL.tar",
+"https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/CSM5FZ3Z_P.fastq.gz",
+"https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/CSM5MCVN.tar",
+"https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/CSM5FZ46_P.fastq.gz",
+"https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/CSM79HJY.tar",
+"https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/CSM67UBH.tar",
+"https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/CSM79HJW.tar",
+"https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/CSM5FZ42_P.fastq.gz",
+"https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/CSM5FZ44_P.fastq.gz",
+"https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/CSM67UBF.tar",
+"https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/CSM5MCVJ_P.fastq.gz",
+"https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/CSM67UBR.tar",
+"https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/CSM5FZ3T_P.fastq.gz"]
+
+
+```
+
+
+
+```
+	
+["CSM67UBN.tar",
+"CSM5FZ3X_P.fastq.gz",
+"CSM5MCVL.tar",
+"CSM5FZ3Z_P.fastq.gz",
+"CSM5MCVN.tar",
+"CSM5FZ46_P.fastq.gz",
+"CSM79HJY.tar",
+"CSM67UBH.tar",
+"CSM79HJW.tar",
+"CSM5FZ42_P.fastq.gz",
+"CSM5FZ44_P.fastq.gz",
+"CSM67UBF.tar",
+"CSM5MCVJ_P.fastq.gz",
+"CSM67UBR.tar",
+"CSM5FZ3T_P.fastq.gz"]
+
+```

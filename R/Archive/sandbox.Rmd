@@ -1,0 +1,60 @@
+---
+title: "sandbox"
+output: html_document
+---
+
+### truncate output:
+
+```{r trunc-output, include=FALSE}
+# save the built-in output hook
+hook_output <- knitr::knit_hooks$get("output")
+
+# set a new output hook to truncate text output
+knitr::knit_hooks$set(output = function(x, options) {
+  if (!is.null(n <- options$out.lines)) {
+    x <- xfun::split_lines(x)
+    if (length(x) > n) {
+      # truncate the output
+      x <- c(head(x, n), "....\n")
+    }
+    x <- paste(x, collapse = "\n")
+  }
+  hook_output(x, options)
+})
+```
+
+
+
+
+```{r}
+og_metadata %>% filter(`Participant ID` == "C3011") %>% filter(data_type == "metagenomics") %>% arrange(week_num)
+
+
+```
+
+
+
+Take existing sra accs, filter for MGX, split off participant number
+```{r}
+sras_og <- readr::read_csv("sra_accs/sra-manifest.csv")
+```
+
+
+```{r}
+sras <- sras_og %>%
+  separate(`Experiment Title`, c(NA,"smplID_smpltype"), "Subject ")%>%
+  separate(smplID_smpltype, c("smpl_ID", "smpl_type"), "_")%>%
+  filter(smpl_type == "MGX")%>%
+  separate(smpl_ID, c("partp", "week"), 5, remove=F)%>%
+  arrange(partp, week)
+```
+
+```{r}
+sras_2_subset <- sras %>%
+  filter(partp == "H4009" | partp == "C3017")%>%
+  write_csv("sras_H4009_C3017.csv")
+```
+```{r}
+barplot(table(sras$partp))
+sras_num <- as.matrix(table(sras$partp))
+```

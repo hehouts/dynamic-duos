@@ -1,0 +1,122 @@
+---
+title: "one subject"
+output: html_document
+date: '2022-03-18'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r, warning=FALSE}
+setwd("/Users/hehouts/projects/dynamic-duos/R")
+metadata <- clean_names(readr::read_csv("csvs_and_other_metadata/ihmp_metadata.csv", show_col_types = F))
+
+# 2341 - mgx + vrx samples, 1338 + 703 = 2041
+metadata <- metadata %>% 
+  filter(data_type == "metagenomics" | data_type == "viromics") %>% 
+  arrange(participant_id, data_type, week_num)
+
+```
+
+
+```{r}
+c3001 <- metadata %>% 
+  filter(participant_id == "C3001") %>%
+  filter(data_type == "metagenomics")
+
+c3001 
+
+```
+
+
+from the ihmp portal 
+```
+https://portal.hmpdacc.org/query/c?query=subject.project_name%20in%20%5B%22Integrative%20Human%20Microbiome%20Project%22%5D%20and%20sample.body_site%20in%20%5B%22feces%22%5D%20and%20sample.study_name%20in%20%5B%22IBDMDB%22%5D%20and%20file.node_type%20in%20%5B%22wgs_raw_seq_set%22%5D&filters=%7B%22op%22:%22and%22,%22content%22:%5B%7B%22op%22:%22in%22,%22content%22:%7B%22field%22:%22subject.project_name%22,%22value%22:%5B%22Integrative%20Human%20Microbiome%20Project%22%5D%7D%7D,%7B%22op%22:%22in%22,%22content%22:%7B%22field%22:%22sample.body_site%22,%22value%22:%5B%22feces%22%5D%7D%7D,%7B%22op%22:%22in%22,%22content%22:%7B%22field%22:%22sample.study_name%22,%22value%22:%5B%22IBDMDB%22%5D%7D%7D,%7B%22op%22:%22in%22,%22content%22:%7B%22field%22:%22file.node_type%22,%22value%22:%5B%22wgs_raw_seq_set%22%5D%7D%7D%5D%7D&pagination=%7B%22files%22:%7B%22from%22:1,%22size%22:100,%22sort%22:%22file_id:asc%22%7D,%22cases%22:%7B%22from%22:1,%22size%22:100,%22sort%22:%22sample.id:asc%22%7D%7D
+
+```
+
+Here are 7 of 16 mgx samples (there are 3 vrx) page 1
+```
+1419f08f554e0c93f3b62fe90c08f0f2	3001	15	Feces	IBDMDB
+1419f08f554e0c93f3b62fe90c0943df	3001	18	Feces	IBDMDB
+1419f08f554e0c93f3b62fe90c09a02d	3001	19	Feces	IBDMDB
+1419f08f554e0c93f3b62fe90c0a1387	3001	20	Feces	IBDMDB
+1419f08f554e0c93f3b62fe90c0a75df	3001	23	Feces	IBDMDB
+1419f08f554e0c93f3b62fe90c0aca6e	3001	25	Feces	IBDMDB
+1419f08f554e0c93f3b62fe90c0b0d88	3001	26	Feces	IBDMDB
+```
+
+6 found on page 8 (count = 13)
+```
+5994274eae30475ead69bfe27a0b062a	3001	5	Feces	IBDMDB
+5994274eae30475ead69bfe27a0b51f1	3001	6	Feces	IBDMDB
+5994274eae30475ead69bfe27a0bb83d	3001	7	Feces	IBDMDB
+5994274eae30475ead69bfe27a0c48e8	3001	11	Feces	IBDMDB
+5994274eae30475ead69bfe27a0ca404	3001	12	Feces	IBDMDB
+5994274eae30475ead69bfe27a0d13e5	3001	14	Feces	IBDMDB
+```
+
+
+3 on page 14 (count = 16!)
+```
+cad5930efe6763b64b3ccf1cd669a2eb	3001	4	Feces	IBDMDB
+cad5930efe6763b64b3ccf1cd66abcbb	3001	8	Feces	IBDMDB
+cad5930efe6763b64b3ccf1cd66b25cf	3001	13	Feces	IBDMDB
+```
+
+So I guess I can just get a list?
+
+```
+
+https://portal.hmpdacc.org/cases/1419f08f554e0c93f3b62fe90c08f0f2
+https://portal.hmpdacc.org/cases/1419f08f554e0c93f3b62fe90c0943df
+https://portal.hmpdacc.org/cases/1419f08f554e0c93f3b62fe90c09a02d
+https://portal.hmpdacc.org/cases/1419f08f554e0c93f3b62fe90c0a1387
+https://portal.hmpdacc.org/cases/1419f08f554e0c93f3b62fe90c0a75df
+https://portal.hmpdacc.org/cases/1419f08f554e0c93f3b62fe90c0aca6e
+https://portal.hmpdacc.org/cases/1419f08f554e0c93f3b62fe90c0b0d88
+
+
+
+
+
+```
+
+I also have the c3002 here: `/home/hehouts/dynamic-duos-virome/snakecrate/data/raw_data`
+```{r}
+
+c3002 <- metadata %>% 
+  filter(participant_id == "C3002") %>%
+  filter(data_type == "metagenomics")
+```
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+c3008 <- metadata %>% 
+  filter(participant_id == "C3008")
+#
+#    filter(data_type == "metagenomics")
+#  select(external_id)
+  
+  
+c3008 
+
+```

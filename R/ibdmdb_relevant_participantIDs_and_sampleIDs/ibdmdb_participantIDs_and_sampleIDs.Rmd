@@ -17,7 +17,7 @@ library(janitor)
 ```
 
 ## Conclusions:
-1.  List or relevant participant IDs:
+1.  List of relevant participant IDs:
 ```
 C3002
 C3003
@@ -57,6 +57,42 @@ P6037
 ```
 
 2. Table filtered for those is saved as `rel_partp_ihmp_metadata.csv`
+Made by this chunk:
+
+found in "metadata_summary"
+```{r}
+setwd("/Users/hehouts/projects/dynamic-duos/R")
+metadata <- clean_names(readr::read_csv("../metadata/ibdmdb-metadata-manifests/ihmp_metadata.csv", show_col_types = F))
+
+all_samples <- metadata %>% 
+  filter(data_type == "metagenomics" | data_type == "viromics") %>% 
+  arrange(participant_id, data_type, week_num)
+# all mgx & vrx samples in the ibdmdb, saved to a csv
+write_csv(all_samples, "mgx_vrx_ihmp_metadata.csv")
+
+participants <- metadata %>% 
+  filter(data_type == "viromic") %>%
+  filter(antibiotics=="Yes") %>%
+  select(participant_id) %>%
+  distinct(participant_id) %>% 
+  pull(participant_id)
+
+# all mgx & vrx samples from ONLY participants that have vrx samples
+pair_vec <- metadata %>% 
+        select(data_type, participant_id) %>% 
+        filter(data_type == "viromics") %>% 
+        unique() %>% 
+        pull(participant_id)
+
+
+pair_samples <- metadata %>% 
+  filter(data_type == "metagenomics" | data_type == "viromics") %>% 
+  filter(participant_id %in% pair_vec) %>%
+  arrange(participant_id, data_type, week_num)
+pair_samples
+
+write_csv(pair_samples, "paired_mgx_vrx_ihmp_metadata.csv")
+```
 
 ## Methods & Notes:
 ### load data 
