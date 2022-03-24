@@ -1,0 +1,20 @@
+
+
+
+#samples= [x.strip().split("_")[0] for x in open("external_IDs.txt")]            
+
+samples = ['CSM79HKT', 'CSM79HQF']
+
+rule all:                                                                                                
+    input:                                                                                               
+            expand("test/c3008/{sample}.tar", sample = samples)                                
+                                                                                                         
+rule download:                                                                                           
+    output: "test/c3008/{sample}.tar"                                                          
+    params: URL= lambda wildcards: "https://ibdmdb.org/tunnel/static/HMP2/WGS/1818/" + wildcards.sample + ".tar"                                                                                                  
+    shell: "wget -O {output} {params.URL}"                                                               
+                                                                                                         
+rule unzip:                                                                                              
+    input: "test/c3008/{sample}.tar"                                                           
+    output: "test/c3008/{sample}.tar"                                                                      
+    shell: "tar -xvf {input} --directory {output}" 

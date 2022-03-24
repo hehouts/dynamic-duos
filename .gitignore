@@ -5,11 +5,23 @@
 *.tar
 *.zip
 *.sbt
+*.bz2
+*.fq
+*.fa
+*.fna
+*.faa
+*.fastq
+*.fasta
+
 
 ##### Snakemake #####
 *.log
 *.benchmark
 *.snakemake
+
+snakecrate/fulldata/*
+intermediate_files/
+
 
 
 ##### R #####
