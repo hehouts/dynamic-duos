@@ -6,13 +6,13 @@
                                
 # ███ set variables ███
 
-INPUT_DATA = "c3002_mgx.txt"
+INPUT_DATA = "samples_c3002.txt"
 
 #   #generate sample list from file names text file
 FILES = [x.strip().split("\n")[0] for x in open(INPUT_DATA, 'r')]
 
-#SAMPLES = [x.strip().split(".tar")[0] for x in open(INPUT_DATA, 'r')]
-#SAMPLES = [x.strip().split(".fastq.gz")[0] for x in SAMPLES]
+SAMPLES = [x.strip().split(".tar")[0] for x in open(INPUT_DATA, 'r')]
+SAMPLES = [x.strip().split(".fastq.gz")[0] for x in SAMPLES]
 
 
 
