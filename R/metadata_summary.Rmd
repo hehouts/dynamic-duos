@@ -28,6 +28,7 @@ ibdmdb <- ibdmdb %>%
 # 2341 total samples, mgx + mvx
 ibdmdb <- ibdmdb %>% 
   filter(data_type == "metagenomics" | data_type == "viromics") %>% 
+  relocate(external_id, tube_a_viromics, week_num, participant_id, data_type) %>% 
   arrange(participant_id, data_type, week_num)
 
 # 1638 MGX samples
@@ -46,8 +47,7 @@ write_csv(ibdmdb, "csvs_and_other_metadata/ibdmdb_metadata_2341.csv")
 
 ### Chunk 3 - Determine Number of paired MGX and MVX Samples, and Determine Which Have Antibiotic Data
 
-Determine Number of PAIRED MGX and MVX Samples
-
+Conclusions:
 - 130 total participants
 - 105 participants have virome samples
   - 2299 samples are from those 105 participants
@@ -71,7 +71,7 @@ pairs_df <- ibdmdb %>%
   filter(data_type == "metagenomics" | data_type == "viromics") %>% 
   filter(participant_id %in% pair_ids_vec) %>%
   arrange(participant_id, data_type, week_num)
-write_csv(pairs_df, "csvs_and_other_metadata/ihmp_metadata_2299_paired_mgx_vrx.csv")
+#write_csv(pairs_df, "csvs_and_other_metadata/ihmp_metadata_2299_paired_mgx_vrx.csv")
 
 
 ### Antibiotics:
@@ -89,20 +89,251 @@ abx_pairs_df <- ibdmdb %>%
   filter(data_type == "metagenomics" | data_type == "viromics") %>% 
   filter(participant_id %in% abx_pair_ids_vec) %>%
   arrange(participant_id, data_type, week_num)
-write_csv(abx_pairs_df, "csvs_and_other_metadata/ihmp_metadata_838_antibiotics_paired_mgx_vrx.csv")
+#write_csv(abx_pairs_df, "csvs_and_other_metadata/ihmp_metadata_838_antibiotics_paired_mgx_vrx.csv")
 
 ```
 
 
 
 
+```{r}
+ibdmdb %>% 
+  select(contains("tube"))
+```
 
 
 
 
-### Chunk 4
 
-### Chunk
+### Chunk 4 - File IDs for viromes
+I want to have the viromes and metagenomes for 5 participants. 2 have abx, 3 dont.
+
+```
+C3001
+C3002
+C3003
+C3004
+C3005
+```
+
+```{r}
+ibdmdb %>% 
+  filter(participant_id %in% c("C3001", "C3002", "C3003", "C3004", "C3005")) %>%
+  mutate(abx_group = case_when(
+      participant_id %in% abx_pair_ids_vec~T,
+      !(participant_id %in% abx_pair_ids_vec)~F
+      )) %>%
+  select(participant_id, abx_group) %>% 
+  unique()
+
+
+subset5 <- ibdmdb %>% 
+  filter(participant_id %in% c("C3001", "C3002", "C3003", "C3004", "C3005")) %>%
+  mutate(abx_group = case_when(
+      participant_id %in% abx_pair_ids_vec~T,
+      !(participant_id %in% abx_pair_ids_vec)~F
+      )) %>% 
+  relocate(external_id, tube_a_viromics, week_num, participant_id, abx_group, data_type) %>% 
+  select(1:15)
+subset5
+
+subset5_virome_filenames <- subset5 %>% 
+  filter(data_type == "viromics") %>% 
+#  select(tube_a_viromics)
+subset5_virome_filenames
+#   # Using copypasta, these become "../snakecrate/Downloads/s5_virome_tubeids.txt"
+```
+
+
+
+```{r}
+subset5_metagenome_filenames <- subset5 %>% 
+  filter(data_type == "metagenomics") %>% 
+  arrange()
+  select(external_id)
+subset5_metagenome_filenames
+#   # Using copypasta, these become "../snakecrate/Downloads/s5_virome_tubeids.txt"
+```
+
+
+```{r}
+subset5 %>% 
+  mutate(
+    download_URL = case_when(
+      (data_type=="viromics")~"https://ibdmdb.org/tunnel/static/HMP2/Viromics/1732/"
+      )
+    ) %>% relocate(download_URL)
+```
+
+
+
+SM-6UG79.tar
+SM-71WY3.tar
+SM-7CRX4.tar
+SM-6X9WV.tar
+SM-76CAU.tar
+SM-7CP3H.tar
+SM-7EWTT.tar
+SM-6OSOR.tar
+SM-6Y2V3.tar
+SM-77VQ4.tar
+SM-7EWUL.tar
+SM-6WJN6.tar
+SM-6X9X4.tar
+SM-6YAZO.tar
+SM-6ZKSM.tar
+SM-71WXM.tar
+SM-73JY4.tar
+SM-76EOJ.tar
+SM-791BX.tar
+SM-7BF2J.tar
+SM-7CRJ8.tar
+SM-7EWUH.tar
+SM-7GYJO.tar
+SM-7IL1E.tar
+SM-7KPUR.tar
+SM-7MOQJ.tar
+SM-6WOCE.tar
+SM-6ZEVI.tar
+SM-7AA2E.tar
+SM-7BP5L.tar
+SM-7I1G8.tar
+SM-7K25Z.tar
+
+```{r}
+# #filenmaes sucks. idk where i got it from
+#filenames<- read_csv("../snakecrate/Downloads/sample_filenames.txt")
+
+virome_filenames <- read_csv("../snakecrate/Downloads/virome_filenames.txt", col_names = F)
+#names(ibdmdb)
+```
+
+
+
+```{r}
+ibdmdb
+```
+
+
+### Chunk 5 - a new ibdmdb_with_files table
+
+```{r}
+unzipping <- ibdmdb %>% 
+  filter(participant_id %in% c("C3001", "C3002", "C3003", "C3004", "C3005")
+      ) %>%
+  mutate(abx_group = case_when(
+      participant_id %in% abx_pair_ids_vec~T,
+      !(participant_id %in% abx_pair_ids_vec)~F
+      )) %>% 
+  relocate(external_id, tube_a_viromics, week_num, participant_id, abx_group, data_type
+      ) %>% 
+  select(1:12) %>% 
+  mutate(file_prefix = case_when(
+    (data_type == "viromics")~tube_a_viromics,
+    (data_type == "metagenomics")~external_id
+    )
+  ) %>% 
+#  mutate(zip_style =  "STD") %>% 
+  mutate(zip_type = case_when(
+        (data_type == "viromics")~"VIR",
+        (data_type == "metagenomics" &
+           grepl('_P$', external_id) == T)~"P",
+        (data_type == "metagenomics" &
+           grepl('_TR$', external_id) == T)~"TR",
+        (data_type == "metagenomics" &
+           !grepl('_TR$', external_id) &
+           !grepl('_P$', external_id) == T)~"STD"
+    )) %>% 
+mutate(uid = case_when(
+    (data_type == "metagenomics")~external_id,
+    (data_type == "viromics")~tube_a_viromics,
+    )) %>% 
+  mutate(file_suffix = case_when(
+    (zip_type == "VIR")~".tar",
+    (zip_type == "STD")~".tar",
+    (zip_type == "P")~".fastq.gz",
+    (zip_type == "TR" )~".tar",
+    )) %>%
+  relocate(file_prefix, file_suffix) %>% 
+  unite("file", file_prefix:file_suffix, sep = "", remove = F) %>% 
+  relocate(file, zip_type, uid)
+unzipping
+
+unzipping %>% select(file, file_prefix, zip_type, uid) %>% 
+  write_csv("csvs_and_other_metadata/file_prefix_zip_uid.csv")
+
+```
+
+```{bash}
+while IFS="," read -r file prefix zip_type uid
+do
+echo "on file $file with type $zip_type .... "
+  case $zip_type in
+    "VIR")
+      echo "virus"
+      ;;
+    "P"|"TR"|"STD")
+      echo "mtg"
+      ;;
+  esac
+done < <(tail -n +2 csvs_and_other_metadata/file_zip_uid.csv)
+```
+
+if [[ $VAR -gt 10 ]]
+then
+  echo "The variable is greater than 10."
+else
+  echo "The variable is equal or less than 10."
+fi
+
+
+
+
+###Supplementary chunks
+#### Chunk s1
+```{r}
+#### Here I am frantically looking for the column that its matching on 76C9Y, with external_id HSM6XRR7
+
+# reducing the number of columns to char columns, gets down to ~300 from ~500 
+df <- ibdmdb_mvx_only %>% 
+  filter(external_id == "HSM6XRR7") %>% 
+  select(where(is.character))
+
+
+df2 <- df[!map_lgl(df, ~ all(is.na(.)))]
+df2
+
+# df2 only has 131 columns, so I just clicked through them. found:
+
+#`tube_a_viromics`!!!! 
+#which matches the exact virome file name: SM-76C9Y
+
+
+# looking at these "tube" columns is proabably going to be important later, hard listed below 
+#names(
+  ibdmdb %>% 
+  select(contains("tube")) %>% 
+  select(where(is.character)) %>% 
+  drop_na()
+#)
+```
+```
+"serum_tube_number_1_received_at_csmc"
+"serum_tubes_number_2_4_received_at_mgh"
+"tube_a_dna_rna""tube_a_metabolomics"
+"tube_a_storage"
+"tube_a_viromics"
+"tube_b_fecal_calprotectin"
+"tube_b_proteomics"
+"stool_sample_id_tube_a_et_oh"
+"sample_id_tube_b_no_preservative"
+"tube_a_and_b_received_at_broad"    
+```
+#### Chunk s2
+
+
+
+### Chunk SRA
 Read in SRA results:
 
 ```{r}
@@ -181,50 +412,7 @@ left_join(ihmp_mod, sra_mod, by = c("project" = "library_name")) %>%
 ```
 
 
-###Supplementary chunks
-#### Chunk s1
-```{r}
-#### Here I am frantically looking for the column that its matching on 76C9Y, with external_id HSM6XRR7
-
-# reducing the number of columns to char columns, gets down to ~300 from ~500 
-df <- ibdmdb_mvx_only %>% 
-  filter(external_id == "HSM6XRR7") %>% 
-  select(where(is.character))
-
-
-df2 <- df[!map_lgl(df, ~ all(is.na(.)))]
-df2
-
-# df2 only has 131 columns, so I just clicked through them. found:
-
-#`tube_a_viromics`!!!! 
-#which matches the exact virome file name: SM-76C9Y
-
-
-# looking at these "tube" columns is proabably going to be important later, hard listed below 
-#names(
-  ibdmdb %>% 
-  select(contains("tube")) %>% 
-  select(where(is.character)) %>% 
-  drop_na()
-#)
-```
-```
-"serum_tube_number_1_received_at_csmc"
-"serum_tubes_number_2_4_received_at_mgh"
-"tube_a_dna_rna""tube_a_metabolomics"
-"tube_a_storage"
-"tube_a_viromics"
-"tube_b_fecal_calprotectin"
-"tube_b_proteomics"
-"stool_sample_id_tube_a_et_oh"
-"sample_id_tube_b_no_preservative"
-"tube_a_and_b_received_at_broad"    
-```
-#### Chunk s2
-
-
-### Chuck- 
+### Chuck more SRA
 
 does `all_samples$project` merge on `sra$library_name`!?!?! only on viromes
 
@@ -242,3 +430,46 @@ left_join(sum_all_samples, sra, by = c("project" = "library_name")) %>%
 
 
 ```
+
+
+
+### check that all in ibdmdb are unique external_ids
+```{r}
+#1638
+ibdmdb %>% 
+  filter(data_type=="metagenomics") %>% 
+  distinct(external_id)
+
+#703
+ibdmdb %>% 
+  filter(data_type=="viromics") %>% 
+  distinct(external_id)
+
+#2341
+ibdmdb
+
+#1656
+ibdmdb %>% 
+  distinct(external_id)
+
+1638-703
+#935
+
+2341-935
+#1406
+```
+
+### bash sandbox
+
+```{bash}
+while IFS="," read -r file prefix zip_type uid
+do
+  echo "file is $file"
+  echo "file prefix is $prefix"
+  echo "zip_type is $zip_type"
+  echo "uid is $uid"
+done < <(tail -n +2 csvs_and_other_metadata/file_prefix_zip_uid.csv)
+```
+
+
+### end

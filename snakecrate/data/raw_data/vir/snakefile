@@ -97,10 +97,24 @@ rule remove_host:
         human = "../databases/hg19_main_mask_ribo_animal_allplant_allfungus.fa.gz"
     threads: 4
 
-#bbduk requires 64gb of mem, and requires "-n 4" in srun command
+# bbduk requires 64gb of mem, and requires "-n 4" in srun command
+# 
+#        bbduk.sh\
+#        -Xmx8g t=4\
+#        in={input.trim1} in2={input.trim2}\
+#        out={output.nohost_R1} out2={output.nohost_R2}\
+#        outm={output.human_R1} outm2={output.human_R2}\
+#        k=31 ref={input.human}
+# 
+#         bbduk.sh -Xmx8g t={threads} in={input.trim1} in2={input.trim2} out={output.nohost_R1} out2={output.nohost_R2} outm={output.human_R1} outm2={output.human_R2} k=31 ref={input.human}
     shell:
         """
-        bbduk.sh -Xmx8g t=4 in={input.trim1} in2={input.trim2} out={output.nohost_R1} out2={output.nohost_R2} outm={output.human_R1} outm2={output.human_R2} k=31 ref={input.human}
+        bbduk.sh\
+        -Xmx28g\
+        in={input.trim1} in2={input.trim2}\
+        out={output.nohost_R1} out2={output.nohost_R2}\
+        outm={output.human_R1} outm2={output.human_R2}\
+        k=31 ref={input.human}
         """
 
 
