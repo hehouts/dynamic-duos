@@ -1,0 +1,56 @@
+# LOOK OUT! ITS A
+# ██████╗      ██████╗     ██╗    ██╗    ███╗   ██╗    ██╗          ██████╗      █████╗     ██████╗ 
+# ██╔══██╗    ██╔═══██╗    ██║    ██║    ████╗  ██║    ██║         ██╔═══██╗    ██╔══██╗    ██╔══██╗
+# ██║  ██║    ██║   ██║    ██║ █╗ ██║    ██╔██╗ ██║    ██║         ██║   ██║    ███████║    ██║  ██║
+# ██║  ██║    ██║   ██║    ██║███╗██║    ██║╚██╗██║    ██║         ██║   ██║    ██╔══██║    ██║  ██║
+# ██████╔╝    ╚██████╔╝    ╚███╔███╔╝    ██║ ╚████║    ███████╗    ╚██████╔╝    ██║  ██║    ██████╔╝
+# ╚═════╝      ╚═════╝      ╚══╝╚══╝     ╚═╝  ╚═══╝    ╚══════╝     ╚═════╝     ╚═╝  ╚═╝    ╚═════╝ 
+# SNAKEFILE!                                                                                           
+
+# This literally only downloads the data. I think cramming it into the main snakefile is too messy.                                                                                                  
+
+# I use these resources to run this:
+#   srun -p bmm -J download -t 12:00:00 --mem=2G -c 4 --pty bash
+# so that I can use -j4 when running snakemake
+# and the conda envronment (dynduo)                                                                                             
+                               
+# ███ set variables ███
+
+#INPUT_DATA = "virome_filenames.txt"
+INPUT_VIR = "s5_virome_tube_ids.txt"
+#INPUT_MGX = "s5_metagenome_externalids.txt"
+
+
+
+
+SAMPLES_VIR = [x for x in open(INPUT_VIR, 'r')]
+
+SAMPLES_VIR = open('s5_virome_tube_ids.txt').read()
+#SAMPLES_VIR = [x[0] for x in open(INPUT_DATA, 'r')]
+# returns the first char of each thing
+MGX_TARS = INPUT_MGX
+
+SAMPLES_MGX = 
+ [x.strip().split(".tar")[0] for x in open(INPUT_DATA, 'r')]
+#SAMPLES = [x.strip().split(".fastq.gz")[0] for x in SAMPLES]
+
+
+
+
+# ██████████ RULE ALL ██████████
+
+rule all: 
+    input: 
+##   rule download_vrx_data
+        expand("../data/raw_data/{file}", file = FILES),
+
+# ██████████   RULES  ██████████
+rule download_vrx_data:
+    output: "../data/raw_data/{file}"
+    params: 
+#        URL= lambda wildcards: "https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/" + wildcards.file
+#        URL= lambda wildcards: "https://ibdmdb.org/tunnel/static/HMP2/Viromics/1732/" + wildcards.file
+        URL= lambda wildcards: "https://ibdmdb.org/tunnel/static/HMP2/Viromics/1732/" + wildcards.file
+    shell: """
+        wget -O {output} {params.URL}
+    """

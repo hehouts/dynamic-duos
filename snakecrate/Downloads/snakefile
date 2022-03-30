@@ -16,7 +16,9 @@
                                
 # ███ set variables ███
 
-INPUT_DATA = "virome_filenames.txt"
+#INPUT_DATA = "virome_filenames.txt"
+INPUT_DATA = "s5_virome_filenames.txt"
+
 
 #### generate sample list from file,
 ####   where the lines in the file contain full file names, e.g. "QQSSQS.tar"
