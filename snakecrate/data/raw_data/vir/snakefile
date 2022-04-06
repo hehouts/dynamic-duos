@@ -38,9 +38,9 @@ rule all:
 ##   rule fastp
 #        expand("fastp/{sample}_{ext}.trim.fq.gz", sample =SAMPLES, ext = [1,2])
 ##   rule remove_host 
-#        expand("bbduk/{sample}_{ext}.nohost.fq.gz", sample =SAMPLES, ext = [1,2])
+        expand("bbduk/{sample}_{ext}.nohost.fq.gz", sample =SAMPLES, ext = [1,2])
 ##   rule khmer 
-        expand("abundtrim/{sample}.abundtrim.fq.gz", sample =SAMPLES)
+#        expand("abundtrim/{sample}.abundtrim.fq.gz", sample =SAMPLES)
 
 # ██████████   RULES  ██████████
 rule untar:
@@ -96,8 +96,8 @@ rule remove_host:
     input:
         trim1 = "fastp/{sample}_1.trim.fq.gz",
         trim2 = "fastp/{sample}_2.trim.fq.gz",
-        human = "../../../../../../../group/ctbrowngrp/non-microbial-reference/hg19_main_mask_ribo_animal_allplant_allfungus.fa.gz"
-#        human = "../databases/hg19_main_mask_ribo_animal_allplant_allfungus.fa.gz"
+#        human = "../../../../../../../group/ctbrowngrp/non-microbial-reference/hg19_main_mask_ribo_animal_allplant_allfungus.fa.gz"
+        human = "../databases/hg19_main_mask_ribo_animal_allplant_allfungus.fa.gz"
 #    threads: 1
 # bbduk requires 64gb of mem, and requires "-n 4" in srun command
 # 
@@ -112,7 +112,7 @@ rule remove_host:
     shell:
         """
         bbduk.sh\
-        -Xmx105g t=4\
+        -Xmx20g hdist=3 qhdist=3\
         in={input.trim1} in2={input.trim2}\
         out={output.nohost_R1} out2={output.nohost_R2}\
         outm={output.human_R1} outm2={output.human_R2}\
