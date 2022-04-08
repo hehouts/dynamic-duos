@@ -1,6 +1,8 @@
 ---
 title: "Metadata Summary"
-output: html_document
+output: 
+  html_document: 
+    keep_md: yes
 date: '2022-03-16'
 ---
 
@@ -10,11 +12,13 @@ MGX - metagenomic, Bulk fraction
 
 
 ### Chunk 1 - Load Libraries and Data 
-```{r, warning=FALSE}
+```{r Load-Libraries-and-Data, warning=FALSE}
 library(tidyverse)
 library(janitor)
 library(naniar)
+
 #setwd("/Users/hehouts/projects/dynamic-duos/R")
+
 ibdmdb <- clean_names(readr::read_csv("csvs_and_other_metadata/ihmp_metadata.csv", show_col_types = F))
 ibdmdb <- ibdmdb %>% 
   filter(data_type == "metagenomics" | data_type == "viromics") %>% 
@@ -23,8 +27,14 @@ ibdmdb <- ibdmdb %>%
 
 
 ### Chunk 2 - Determine Number of Metagenome and Viromes Samples
-2341 Metagenome + Virome samples
-```{r}
+Conclusions:
+* 2341 Metagenome & Virome samples from the iHMP IBD Study
+  + 1638 Metagenomes 
+  + 703 Viromes. 
+
+
+```{r Determine-Number-of-Metagenome-and-Viromes-Samples}
+
 # 2341 total samples, mgx + mvx
 ibdmdb <- ibdmdb %>% 
   filter(data_type == "metagenomics" | data_type == "viromics") %>% 
@@ -45,14 +55,14 @@ ibdmdb_mvx_only <- ibdmdb %>%
 write_csv(ibdmdb, "csvs_and_other_metadata/ibdmdb_metadata_2341.csv")
 ```
 
-### Chunk 3 - Determine Number of paired MGX and MVX Samples, and Determine Which Have Antibiotic Data
+### Chunk 3 - Determine Number of participants with both MVX and MGX Samples, and Determine Which Have Antibiotic Data
 
 Conclusions:
-- 130 total participants
-- 105 participants have virome samples
-  - 2299 samples are from those 105 participants
-- 34 participants that have viromes samples, and had antibiotics
-  - 838 samples are from those 34 participants
+* 130 total participants in the study
+* 105 participants have both virome and metagenome samples
+  + 2299 samples are from those 105 participants
+* 34 participants that have viromes samples, and had antibiotics
+  + 838 samples are from those 34 participants
 
 ```{r}
 
@@ -95,7 +105,9 @@ abx_pairs_df <- ibdmdb %>%
 
 
 
+### Chunk 5 - Finding existing filenames for viromes in the ibdmdb metadata
 
+After some sleuthing, it was determined that the existing virome filenames, which start with the prefix `SM-`, correspond with the `tube_a_viromics` column
 ```{r}
 ibdmdb %>% 
   select(contains("tube"))
@@ -105,8 +117,8 @@ ibdmdb %>%
 
 
 
-### Chunk 4 - File IDs for viromes
-I want to have the viromes and metagenomes for 5 participants. 2 have abx, 3 dont.
+### Chunk 4 - s5 subset: File IDs for viromes
+I want to have the viromes and metagenomes for the following 5 participants. (2 have abx, 3 dont)
 
 ```
 C3001
@@ -116,7 +128,7 @@ C3004
 C3005
 ```
 
-```{r}
+```{r, eval=FALSE}
 ibdmdb %>% 
   filter(participant_id %in% c("C3001", "C3002", "C3003", "C3004", "C3005")) %>%
   mutate(abx_group = case_when(
@@ -138,15 +150,21 @@ subset5 <- ibdmdb %>%
 subset5
 
 subset5_virome_filenames <- subset5 %>% 
+  filter(data_type == "viromics")
+  
+  subset5_virome_filenames <- subset5 %>% 
   filter(data_type == "viromics") %>% 
-#  select(tube_a_viromics)
+  select(tube_a_viromics)
 subset5_virome_filenames
 #   # Using copypasta, these become "../snakecrate/Downloads/s5_virome_tubeids.txt"
+
+
+
 ```
 
 
 
-```{r}
+```{r, eval=FALSE}
 subset5_metagenome_filenames <- subset5 %>% 
   filter(data_type == "metagenomics") %>% 
   arrange()
@@ -156,7 +174,7 @@ subset5_metagenome_filenames
 ```
 
 
-```{r}
+```{r, eval=F}
 subset5 %>% 
   mutate(
     download_URL = case_when(
@@ -218,9 +236,115 @@ ibdmdb
 ### Chunk 5 - a new ibdmdb_with_files table
 
 ```{r}
-unzipping <- ibdmdb %>% 
-  filter(participant_id %in% c("C3001", "C3002", "C3003", "C3004", "C3005")
-      ) %>%
+ibdmdb_uids <- ibdmdb %>% 
+  mutate(abx_group = case_when(
+      participant_id %in% abx_pair_ids_vec~T,
+      !(participant_id %in% abx_pair_ids_vec)~F
+      )) %>% 
+  relocate(external_id, tube_a_viromics, week_num, participant_id, abx_group, data_type
+      ) %>% 
+  select(1:12) %>% 
+  mutate(file_prefix = case_when(
+    (data_type == "viromics")~tube_a_viromics,
+    (data_type == "metagenomics")~external_id
+    )
+  ) %>% 
+  mutate(zip_type = case_when(
+        (data_type == "viromics")~"VIR",
+        (data_type == "metagenomics" &
+           grepl('_P$', external_id) == T)~"P",
+        (data_type == "metagenomics" &
+           grepl('_TR$', external_id) == T)~"TR",
+        (data_type == "metagenomics" &
+           !grepl('_TR$', external_id) &
+           !grepl('_P$', external_id) == T)~"STD"
+    )) %>% 
+mutate(uid = case_when(
+    (data_type == "metagenomics")~external_id,
+    (data_type == "viromics")~tube_a_viromics,
+    )) %>% 
+  mutate(file_suffix = case_when(
+    (zip_type == "VIR")~".tar",
+    (zip_type == "STD")~".tar",
+    (zip_type == "P")~".fastq.gz",
+    (zip_type == "TR" )~".tar",
+    )) %>%
+  relocate(file_prefix, file_suffix) %>% 
+  unite("file", file_prefix:file_suffix, sep = "", remove = F) %>% 
+  relocate(file, zip_type, uid)
+ibdmdb_uids
+
+ibdmdb_uids_s5 <- ibdmdb_uids %>% filter(participant_id %in% c("C3001", "C3002", "C3003", "C3004", "C3005"))
+
+ibdmdb_uids %>% select(file, file_prefix, zip_type, uid) %>% 
+  write_csv("csvs_and_other_metadata/file_prefix_zip_uid.csv")
+
+ibdmdb_uids %>% 
+  filter(participant_id %in% c("C3001", "C3002", "C3003", "C3004", "C3005")) %>%
+  select(file, file_prefix, zip_type, uid) %>%
+  write_csv("csvs_and_other_metadata/file_prefix_zip_uid_s5.csv")
+
+
+```
+
+
+```{r}
+unzipping %>% filter(zip_type == "VIR") %>% select(file) %>%  
+  write_csv("../snakecrate/data/raw_data/vir/s5_vir_prefixes.csv", col_names = F)
+
+unzipping %>% filter(zip_type == "VIR") %>% select(file) %>%  
+  write_csv("../snakecrate/data/raw_data/vir/s5_vir_prefixes.csv", col_names = F)
+
+```
+
+
+## Makes the filename.txt's for all the subtypes
+
+```{r}
+# VIR
+ibdmdb_uids %>% filter(zip_type == "VIR") %>% select(file) %>%  
+  write_csv("../snakecrate/data/raw_data/vir/vir_filenames.txt", col_names = F)
+
+ibdmdb_uids_s5  %>% filter(zip_type == "VIR") %>% select(file) %>%  
+  write_csv("../snakecrate/data/raw_data/vir/s5_vir_filenames.txt", col_names = F)
+######
+
+
+# TR
+ibdmdb_uids %>% filter(zip_type == "TR") %>% select(file) %>%  
+  write_csv("../snakecrate/data/raw_data/tr/tr_filenames.txt", col_names = F)
+
+ibdmdb_uids_s5  %>% filter(zip_type == "TR") %>% select(file) %>%  
+  write_csv("../snakecrate/data/raw_data/tr/s5_tr_filenames.txt", col_names = F)
+######
+
+
+# P 
+ibdmdb_uids %>% filter(zip_type == "P") %>% select(file) %>%  
+  write_csv("../snakecrate/data/raw_data/p/p_filenames.txt", col_names = F)
+
+ibdmdb_uids_s5  %>% filter(zip_type == "P") %>% select(file) %>%  
+  write_csv("../snakecrate/data/raw_data/p/s5_p_filenames.txt", col_names = F)
+######
+
+
+# STD
+ibdmdb_uids %>% filter(zip_type == "STD") %>% select(file) %>%  
+  write_csv("../snakecrate/data/raw_data/std/std_filenames.txt", col_names = F)
+
+ibdmdb_uids_s5  %>% filter(zip_type == "STD") %>% select(file) %>%  
+  write_csv("../snakecrate/data/raw_data/std/s5_std_filenames.txt", col_names = F)
+######
+
+
+```
+
+
+
+```{r}
+
+
+all_P_files <- ibdmdb %>%
   mutate(abx_group = case_when(
       participant_id %in% abx_pair_ids_vec~T,
       !(participant_id %in% abx_pair_ids_vec)~F
@@ -256,13 +380,14 @@ mutate(uid = case_when(
     )) %>%
   relocate(file_prefix, file_suffix) %>% 
   unite("file", file_prefix:file_suffix, sep = "", remove = F) %>% 
-  relocate(file, zip_type, uid)
-unzipping
+  relocate(file, zip_type, uid) %>% 
+  filter(zip_type== "P") %>% 
+  select(file)%>%  
+  write_csv("../snakecrate/data/raw_data/p/all.csv", col_names = F)
 
-unzipping %>% select(file, file_prefix, zip_type, uid) %>% 
-  write_csv("csvs_and_other_metadata/file_prefix_zip_uid.csv")
 
 ```
+
 
 ```{bash}
 while IFS="," read -r file prefix zip_type uid

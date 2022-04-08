@@ -1,48 +1,50 @@
 # LOOK OUT! ITS A
+#
+#██╗   ██╗    ██╗    ██████╗ 
+#██║   ██║    ██║    ██╔══██╗
+#██║   ██║    ██║    ██████╔╝
+#╚██╗ ██╔╝    ██║    ██╔══██╗
+# ╚████╔╝     ██║    ██║  ██║
+#  ╚═══╝      ╚═╝    ╚═╝  ╚═╝
+                            
 # ██████╗      ██████╗     ██╗    ██╗    ███╗   ██╗    ██╗          ██████╗      █████╗     ██████╗ 
 # ██╔══██╗    ██╔═══██╗    ██║    ██║    ████╗  ██║    ██║         ██╔═══██╗    ██╔══██╗    ██╔══██╗
 # ██║  ██║    ██║   ██║    ██║ █╗ ██║    ██╔██╗ ██║    ██║         ██║   ██║    ███████║    ██║  ██║
 # ██║  ██║    ██║   ██║    ██║███╗██║    ██║╚██╗██║    ██║         ██║   ██║    ██╔══██║    ██║  ██║
 # ██████╔╝    ╚██████╔╝    ╚███╔███╔╝    ██║ ╚████║    ███████╗    ╚██████╔╝    ██║  ██║    ██████╔╝
 # ╚═════╝      ╚═════╝      ╚══╝╚══╝     ╚═╝  ╚═══╝    ╚══════╝     ╚═════╝     ╚═╝  ╚═╝    ╚═════╝ 
+#
 # SNAKEFILE!                                                                                           
 
-# This literally only downloads the data. I think cramming it into the main snakefile is too messy.                                                                                                  
+# This literally only downloads the virome data. Cramming it into the main snakefile would be too messy too messy.                                                                                                  
 
 # I use these resources to run this:
 #   srun -p bmm -J download -t 12:00:00 --mem=2G -c 4 --pty bash
 # so that I can use -j4 when running snakemake
-# and the conda envronment (dynduo)                                                                                             
+# and the conda envronment (dynduo)                                                                                                
                                
 # ███ set variables ███
 
-#INPUT_DATA = "virome_filenames.txt"
-INPUT_DATA = "s5_virome_filenames.txt"
+INPUT_DATA = "vir_744_filenames.txt"
+#INPUT_DATA = "s5_vir_filenames.txt"
 
-
-#### generate sample list from file,
-####   where the lines in the file contain full file names, e.g. "QQSSQS.tar"
+# keeps the .tar
 FILES = [x.strip().split("\n")[0] for x in open(INPUT_DATA, 'r')]
 
+# no .tar
 SAMPLES = [x.strip().split(".tar")[0] for x in open(INPUT_DATA, 'r')]
-#SAMPLES = [x.strip().split(".fastq.gz")[0] for x in SAMPLES]
-
-
-
 
 # ██████████ RULE ALL ██████████
 
 rule all: 
     input: 
 ##   rule download_data
-        expand("../data/raw_data/{file}", file = FILES),
+        expand("../data/raw_data/vir/tars/{file}", file = FILES),
 
 # ██████████   RULES  ██████████
 rule download_data:
-    output: "../data/raw_data/{file}"
+    output: "../data/raw_data/vir/tars/{file}"
     params: 
-#        URL= lambda wildcards: "https://downloads.hmpdacc.org/ihmp/ibd/genome/microbiome/wgs/raw/" + wildcards.file
-#        URL= lambda wildcards: "https://ibdmdb.org/tunnel/static/HMP2/Viromics/1732/" + wildcards.file
         URL= lambda wildcards: "https://ibdmdb.org/tunnel/static/HMP2/Viromics/1732/" + wildcards.file
     shell: """
         wget -O {output} {params.URL}

@@ -1,30 +1,24 @@
 # LOOK OUT! ITS A
 #
-#██╗   ██╗    ██╗    ██████╗     
-#██║   ██║    ██║    ██╔══██╗    
-#██║   ██║    ██║    ██████╔╝    
-#╚██╗ ██╔╝    ██║    ██╔══██╗    
-# ╚████╔╝     ██║    ██║  ██║    
-#  ╚═══╝      ╚═╝    ╚═╝  ╚═╝   
+#████████╗    ██████╗     
+#╚══██╔══╝    ██╔══██╗    
+#   ██║       ██████╔╝    
+#   ██║       ██╔══██╗    
+#   ██║       ██║  ██║    
+#   ╚═╝       ╚═╝  ╚═╝                            
 #
-#██████╗     ██████╗     ███████╗    ██████╗                                                                        
-#██╔══██╗    ██╔══██╗    ██╔════╝    ██╔══██╗                                                                       
-#██████╔╝    ██████╔╝    █████╗      ██████╔╝                                                                       
-#██╔═══╝     ██╔══██╗    ██╔══╝      ██╔═══╝                                                                        
-#██║         ██║  ██║    ███████╗    ██║                                                                            
+#██████╗     ██████╗     ███████╗    ██████╗   
+#██╔══██╗    ██╔══██╗    ██╔════╝    ██╔══██╗   
+#██████╔╝    ██████╔╝    █████╗      ██████╔╝   
+#██╔═══╝     ██╔══██╗    ██╔══╝      ██╔═══╝     
+#██║         ██║  ██║    ███████╗    ██║       
 #╚═╝         ╚═╝  ╚═╝    ╚══════╝    ╚═╝       (Preprocessing)    
 #
-# SNAKEFILE!                                                                                           
-# This literally only runs for the viromes                                                                                         
+# SNAKEFILE!            
 
-# the conda envronment is (dynduo)                                                                                             
-
-
-
-# ███ set variables ███
 
 #INPUT_DATA = "virome_filenames.txt"
-INPUT_DATA = "vir_filenames.txt"
+INPUT_DATA = "s5_vir.csv"
 
 
 #### generate sample list from file,
@@ -109,10 +103,10 @@ rule remove_host:
     input:
         trim1 = "fastp/{sample}_1.trim.fq.gz",
         trim2 = "fastp/{sample}_2.trim.fq.gz",
-#        human = "../../../../../../../group/ctbrowngrp/non-microbial-reference/hg19_main_mask_ribo_animal_allplant_allfungus.fa.gz",
-        human = "../databases/hg19_main_mask_ribo_animal_allplant_allfungus.fa.gz",
-        threads = 4
-#
+        human = "../../../../../../../group/ctbrowngrp/non-microbial-reference/hg19_main_mask_ribo_animal_allplant_allfungus.fa.gz"
+#        human = "../databases/hg19_main_mask_ribo_animal_allplant_allfungus.fa.gz"
+        threads: 4
+
 # If trying to run locally, use
 #        """
 #        bbduk.sh\
@@ -121,12 +115,14 @@ rule remove_host:
 #        out={output.nohost_R1} out2={output.nohost_R2}\
 #        outm={output.human_R1} outm2={output.human_R2}\
 #        k=31 ref={input.human}
-#      """
+#        """
+
     shell:
         """
-        bbduk.sh -Xmx128g t=4 \
+        bbduk.sh\
+        -Xmx128g t={threads}\
         in={input.trim1} in2={input.trim2}\
-         out={output.nohost_R1} out2={output.nohost_R2}\
+        out={output.nohost_R1} out2={output.nohost_R2}\
         outm={output.human_R1} outm2={output.human_R2}\
         k=31 ref={input.human}
         """

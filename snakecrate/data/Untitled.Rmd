@@ -1,0 +1,45 @@
+---
+title: "fix_file_names"
+output: html_document
+date: '2022-03-25'
+---
+```{r}
+getwd()
+```
+
+```{r, warning=FALSE}
+library(tidyverse)
+library(janitor)
+library(naniar)
+#setwd("/Users/hehouts/projects/dynamic-duos/R")
+#ibdmdb <- clean_names(readr::read_csv("../../R/csvs_and_other_metadata/ihmp_metadata.csv", show_col_types = F))
+ibdmdb <- ibdmdb %>% 
+  filter(data_type == "metagenomics" | data_type == "viromics") %>% 
+  relocate(external_id, tube_a_viromics, week_num, participant_id, data_type) %>% 
+  arrange(participant_id, data_type, week_num) %>% 
+#  filter(participant_id %in% c("C3001", "C3002", "C3003", "C3004", "C3005")) %>%
+  mutate(abx_group = case_when(
+      participant_id %in% abx_pair_ids_vec~T,
+      !(participant_id %in% abx_pair_ids_vec)~F
+      )) %>% 
+  relocate(external_id, tube_a_viromics, week_num, participant_id, abx_group, data_type)
+
+
+
+
+
+
+# hard saved the modified version
+write_csv(ibdmdb, "csvs_and_other_metadata/ibdmdb_metadata_2341.csv")
+```
+
+```{r}
+subset5 <- ibdmdb %>% 
+  filter(participant_id %in% c("C3001", "C3002", "C3003", "C3004", "C3005")) %>%
+  mutate(abx_group = case_when(
+      participant_id %in% abx_pair_ids_vec~T,
+      !(participant_id %in% abx_pair_ids_vec)~F
+      )) %>% 
+  relocate(external_id, tube_a_viromics, week_num, participant_id, abx_group, data_type)
+  
+```
