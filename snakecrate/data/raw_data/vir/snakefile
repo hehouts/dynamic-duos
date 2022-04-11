@@ -24,7 +24,8 @@
 # ███ set variables ███
 
 #INPUT_DATA = "virome_filenames.txt"
-INPUT_DATA = "vir_filenames.txt"
+#INPUT_DATA = "vir_filenames.txt"
+INPUT_DATA = "s5_vir_filenames.txt"
 
 
 #### generate sample list from file,
@@ -106,12 +107,13 @@ rule remove_host:
         nohost_R2 = "bbduk/{sample}_2.nohost.fq.gz",
         human_R1  = "bbduk/{sample}_1.human.fq.gz",
         human_R2  = "bbduk/{sample}_2.human.fq.gz"
+
     input:
         trim1 = "fastp/{sample}_1.trim.fq.gz",
         trim2 = "fastp/{sample}_2.trim.fq.gz",
-#        human = "../../../../../../../group/ctbrowngrp/non-microbial-reference/hg19_main_mask_ribo_animal_allplant_allfungus.fa.gz",
-        human = "../databases/hg19_main_mask_ribo_animal_allplant_allfungus.fa.gz",
-        threads = 4
+        human = "../../../../../../../group/ctbrowngrp/non-microbial-reference/hg19_main_mask_ribo_animal_allplant_allfungus.fa.gz",
+#        human = "../databases/hg19_main_mask_ribo_animal_allplant_allfungus.fa.gz",
+#    threads = 4
 #
 # If trying to run locally, use
 #        """
@@ -124,9 +126,9 @@ rule remove_host:
 #      """
     shell:
         """
-        bbduk.sh -Xmx128g t=4 \
+        bbduk.sh -Xmx64g t=4 \
         in={input.trim1} in2={input.trim2}\
-         out={output.nohost_R1} out2={output.nohost_R2}\
+        out={output.nohost_R1} out2={output.nohost_R2}\
         outm={output.human_R1} outm2={output.human_R2}\
         k=31 ref={input.human}
         """
