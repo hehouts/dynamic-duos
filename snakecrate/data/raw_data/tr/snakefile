@@ -17,8 +17,8 @@
 # SNAKEFILE!            
 
 
-#INPUT_DATA = "virome_filenames.txt"
-INPUT_DATA = "s5_vir.csv"
+INPUT_DATA = "tr_filenames.txt"
+#INPUT_DATA = "s5_tr_filenames.txt"
 
 
 #### generate sample list from file,
@@ -42,7 +42,7 @@ SAMPLES = [x.strip().split(".tar")[0] for x in open(INPUT_DATA, 'r')]
 rule all: 
     input: 
 ##   rule untar
-#        expand("vir_gzips/{sample}_{ext}.fq.gz",  sample =SAMPLES, ext = [1,2])
+#        expand("gzips/{sample}_{ext}.fq.gz",  sample =SAMPLES, ext = [1,2])
 ##   rule fastp
 #        expand("fastp/{sample}_{ext}.trim.fq.gz", sample =SAMPLES, ext = [1,2])
 ##   rule remove_host 
@@ -58,18 +58,12 @@ rule untar:
     #   no input, since the tar files are deleted because they are clogging up my harddrive 
     shell: """
         tar xf tars/{wildcards.sample}.tar
-        rm     tars/{wildcards.sample}.tar
 
-        bzip2 -d {wildcards.sample}_1_sequence.txt.bz2
-        gzip -c  {wildcards.sample}_1_sequence.txt > {output.F1}
-        rm {wildcards.sample}_1_sequence.txt
+        mv {wildcards.sample}_R1.fastq.gz {output.F1}
       
-        bzip2 -d {wildcards.sample}_2_sequence.txt.bz2
-        gzip -c  {wildcards.sample}_2_sequence.txt > {output.F2}
-        rm {wildcards.sample}_2_sequence.txt
+        mv {wildcards.sample}_R2.fastq.gz {output.F2}
     """
-
-
+#        rm  tars/{wildcards.sample}.tar
 
 rule fastp:
     output:
@@ -79,8 +73,8 @@ rule fastp:
         json="fastp/reports/{sample}_fastp.json"
 
     input:
-        gz1 = "vir_gzips/{sample}_1.fq.gz",
-        gz2 = "vir_gzips/{sample}_2.fq.gz"
+        gz1 = "gzips/{sample}_1.fq.gz",
+        gz2 = "gzips/{sample}_2.fq.gz"
     log:
         "logs/{sample}_fastp.log"  
     benchmark:
@@ -105,7 +99,7 @@ rule remove_host:
         trim2 = "fastp/{sample}_2.trim.fq.gz",
         human = "../../../../../../../group/ctbrowngrp/non-microbial-reference/hg19_main_mask_ribo_animal_allplant_allfungus.fa.gz"
 #        human = "../databases/hg19_main_mask_ribo_animal_allplant_allfungus.fa.gz"
-        threads: 4
+
 
 # If trying to run locally, use
 #        """
@@ -120,7 +114,7 @@ rule remove_host:
     shell:
         """
         bbduk.sh\
-        -Xmx128g t={threads}\
+        -Xmx64g t=4\
         in={input.trim1} in2={input.trim2}\
         out={output.nohost_R1} out2={output.nohost_R2}\
         outm={output.human_R1} outm2={output.human_R2}\

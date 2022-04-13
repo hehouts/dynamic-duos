@@ -25,8 +25,9 @@
                                
 # ███ set variables ███
 
-INPUT_DATA = "vir_744_filenames.txt"
+#INPUT_DATA = "vir_744_filenames.txt"
 #INPUT_DATA = "s5_vir_filenames.txt"
+INPUT_DATA = "oops.txt"
 
 # keeps the .tar
 FILES = [x.strip().split("\n")[0] for x in open(INPUT_DATA, 'r')]
