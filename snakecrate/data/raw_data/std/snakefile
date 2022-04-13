@@ -32,7 +32,7 @@ INPUT_DATA = "s5_std_filenames.txt"
 FILES = [x.strip().split("\n")[0] for x in open(INPUT_DATA, 'r')]
 SAMPLES = [x.strip().split(".tar")[0] for x in open(INPUT_DATA, 'r')]
 #SAMPLES = [x.strip().split(".fastq.gz")[0] for x in SAMPLES]
-
+SAMPLES = SAMPLES[:30]
 
 #software:
 #snakemake
@@ -48,7 +48,7 @@ SAMPLES = [x.strip().split(".tar")[0] for x in open(INPUT_DATA, 'r')]
 rule all: 
     input: 
 ##   rule untar
-        expand("gzips/{sample}_{ext}.fastq.gz",  sample =SAMPLES, ext = [1,2])
+        expand("gzips/{sample}_{ext}.fq.gz",  sample =SAMPLES, ext = [1,2])
 ##   rule fastp
 #        expand("fastp/{sample}_{ext}.trim.fq.gz", sample =SAMPLES, ext = [1,2])
 ##   rule remove_host 
@@ -68,25 +68,24 @@ rule untar:
         mkdir {wildcards.sample}/
         tar xf tars/{wildcards.sample}.tar --directory {wildcards.sample}/
         cd {wildcards.sample}/
+
+        myarray=(`find ./ -maxdepth 1 -name "*_sequence.txt.bz2"`)
         
+        if [ ${{#myarray[@]}} -gt 0 ]
+        then
+            bzip2 -d *_1_sequence.txt.bz2
+            gzip -c  *_1_sequence.txt > ../{output.F1}
+            rm *_1_sequence.txt
 
-        FILE=*_1_sequence.txt.bz2
-            if test -f "$FILE"; then
-                echo "$FILE exists."
-            fi
+            bzip2 -d *_2_sequence.txt.bz2
+            gzip -c  *_2_sequence.txt > ../{output.F2}
+            rm *_2_sequence.txt 
 
+        else 
+            mv *_R1.fastq.gz ../gzips/{output.F1}
+            mv *_R2.fastq.gz ../gzips/{output.F2}
 
-        
-        bzip2 -d /*_1_sequence.txt.bz2
-        gzip -c  /*_1_sequence.txt > ../{output.F1}
-        rm *_1_sequence.txt
-      
-        bzip2 -d /*_2_sequence.txt.bz2
-        gzip -c  /*_2_sequence.txt > ../{output.F1}
-        rm *_2_sequence.txt
-
-        mv *_R1.fastq.gz ../gzips/*_1.fq.gz
-        mv *_R2.fastq.gz ../gzips/*_2.fq.gz
+        fi
 
         cd ..
         rmdir  {wildcards.sample}/
@@ -96,7 +95,7 @@ rule untar:
 #        bzip2 -d {wildcards.sample}_2_sequence.txt.bz2
 #        gzip -c  {wildcards.sample}_2_sequence.txt > {output.F2}
 #        rm {wildcards.sample}_2_sequence.txt
-
+#       rm     tars/{wildcards.sample}.tar
 
 
 

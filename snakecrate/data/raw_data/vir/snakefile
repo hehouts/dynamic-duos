@@ -23,9 +23,8 @@
 
 # ███ set variables ███
 
-#INPUT_DATA = "virome_filenames.txt"
-#INPUT_DATA = "vir_filenames.txt"
-INPUT_DATA = "s5_vir_filenames.txt"
+INPUT_DATA = "vir_703_filenames.txt"
+#INPUT_DATA = "s5_vir_filenames.txt"
 
 
 #### generate sample list from file,
@@ -49,13 +48,13 @@ SAMPLES = [x.strip().split(".tar")[0] for x in open(INPUT_DATA, 'r')]
 rule all: 
     input: 
 ##   rule untar
-#        expand("vir_gzips/{sample}_{ext}.fq.gz",  sample =SAMPLES, ext = [1,2])
+#        expand("gzips/{sample}_{ext}.fq.gz",  sample =SAMPLES, ext = [1,2])
 ##   rule fastp
 #        expand("fastp/{sample}_{ext}.trim.fq.gz", sample =SAMPLES, ext = [1,2])
 ##   rule remove_host 
-        expand("bbduk/{sample}_{ext}.nohost.fq.gz", sample =SAMPLES, ext = [1,2])
+#        expand("bbduk/{sample}_{ext}.nohost.fq.gz", sample =SAMPLES, ext = [1,2])
 ##   rule khmer 
-#        expand("abundtrim/{sample}.abundtrim.fq.gz", sample =SAMPLES)
+        expand("abundtrim/{sample}.abundtrim.fq.gz", sample =SAMPLES)
 
 # ██████████   RULES  ██████████
 rule untar:
@@ -65,7 +64,6 @@ rule untar:
     #   no input, since the tar files are deleted because they are clogging up my harddrive 
     shell: """
         tar xf tars/{wildcards.sample}.tar
-        rm     tars/{wildcards.sample}.tar
 
         bzip2 -d {wildcards.sample}_1_sequence.txt.bz2
         gzip -c  {wildcards.sample}_1_sequence.txt > {output.F1}
@@ -74,6 +72,8 @@ rule untar:
         bzip2 -d {wildcards.sample}_2_sequence.txt.bz2
         gzip -c  {wildcards.sample}_2_sequence.txt > {output.F2}
         rm {wildcards.sample}_2_sequence.txt
+
+        rm     tars/{wildcards.sample}.tar
     """
 
 
@@ -86,8 +86,8 @@ rule fastp:
         json="fastp/reports/{sample}_fastp.json"
 
     input:
-        gz1 = "vir_gzips/{sample}_1.fq.gz",
-        gz2 = "vir_gzips/{sample}_2.fq.gz"
+        gz1 = "gzips/{sample}_1.fq.gz",
+        gz2 = "gzips/{sample}_2.fq.gz"
     log:
         "logs/{sample}_fastp.log"  
     benchmark:
