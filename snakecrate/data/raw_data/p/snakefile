@@ -1,11 +1,12 @@
 # LOOK OUT! ITS A
 #
-#███████╗    ████████╗    ██████╗ 
-#██╔════╝    ╚══██╔══╝    ██╔══██╗
-#███████╗       ██║       ██║  ██║
-#╚════██║       ██║       ██║  ██║
-#███████║       ██║       ██████╔╝
-#╚══════╝       ╚═╝       ╚═════╝                                  
+#      ██████╗ 
+#      ██╔══██╗
+#      ██████╔╝
+#      ██╔═══╝ 
+#      ██║     
+#      ╚═╝     
+#                     
 #
 #██████╗     ██████╗     ███████╗    ██████╗                                                                        
 #██╔══██╗    ██╔══██╗    ██╔════╝    ██╔══██╗                                                                       
@@ -23,16 +24,16 @@
 
 # ███ set variables ███
 
-#INPUT_DATA = "std_filenames.txt"
-INPUT_DATA = "s5_std_filenames.txt"
+#INPUT_DATA = "p_filenames.txt"
+INPUT_DATA = "s5_p_filenames.txt"
 
 
 #### generate sample list from file,
 ####   where the lines in the file contain full file names, e.g. "QQSSQS.tar"
 FILES = [x.strip().split("\n")[0] for x in open(INPUT_DATA, 'r')]
-SAMPLES = [x.strip().split(".tar")[0] for x in open(INPUT_DATA, 'r')]
+SAMPLES = [x.strip().split(".fastq.gz")[0] for x in open(INPUT_DATA, 'r')]
 #SAMPLES = [x.strip().split(".fastq.gz")[0] for x in SAMPLES]
-#SAMPLES = SAMPLES[:30]
+#SAMPLES = SAMPLES[:1]
 
 #software:
 #snakemake
@@ -42,53 +43,30 @@ SAMPLES = [x.strip().split(".tar")[0] for x in open(INPUT_DATA, 'r')]
 # khmer
 #    conda install -y khmer
 
+
 # ██████████ RULE ALL ██████████
 
 rule all: 
     input: 
 ##   rule untar
-#        expand("gzips/{sample}_{ext}.fq.gz",  sample =SAMPLES, ext = [1,2])
+#        expand("gzips/{sample}.fq.gz",  sample =SAMPLES)
 ##   rule fastp
 #        expand("fastp/{sample}_{ext}.trim.fq.gz", sample =SAMPLES, ext = [1,2])
 ##   rule remove_host 
-#        expand("bbduk/{sample}_{ext}.nohost.fq.gz", sample =SAMPLES, ext = [1,2])
+        expand("bbduk/{sample}.nohost.fq.gz", sample =SAMPLES)
 ##   rule khmer 
-        expand("abundtrim/{sample}.abundtrim.fq.gz", sample =SAMPLES)
+#        expand("abundtrim/{sample}.abundtrim.fq.gz", sample =SAMPLES)
 
 # ██████████   RULES  ██████████
 rule untar:
     output: 
     # in this snakefile, im leaving the extension as .fastq.gz, because I dont want to deal with renaming 
-        F1 = "gzips/{sample}_1.fq.gz",
-        F2 = "gzips/{sample}_2.fq.gz"
+        "gzips/{sample}.fq.gz"
+        
     #   no input, since the tar files are deleted because they are clogging up my harddrive 
     shell: """
-        
-        mkdir -p {wildcards.sample}/
-        tar xf tars/{wildcards.sample}.tar --directory {wildcards.sample}/
-        cd {wildcards.sample}/
+            mv gzips/{wildcards.sample}.fastq.gz {output}
 
-        myarray=(`find ./ -maxdepth 1 -name "*_sequence.txt.bz2"`)
-        
-        if [ ${{#myarray[@]}} -gt 0 ]
-        then
-            bzip2 -d *_1_sequence.txt.bz2
-            gzip -c  *_1_sequence.txt > ../{output.F1}
-            rm *_1_sequence.txt
-
-            bzip2 -d *_2_sequence.txt.bz2
-            gzip -c  *_2_sequence.txt > ../{output.F2}
-            rm *_2_sequence.txt 
-
-        else 
-            mv *_R1.fastq.gz ../{output.F1}
-            mv *_R2.fastq.gz ../{output.F2}
-
-        fi
-
-        cd ..
-        rmdir  {wildcards.sample}/
-        rm     tars/{wildcards.sample}.tar
     """
 #        old (vir) unzip technique, chuck?      
 #        bzip2 -d {wildcards.sample}_2_sequence.txt.bz2
@@ -100,22 +78,20 @@ rule untar:
 
 rule fastp:
     output:
-        trim1="fastp/{sample}_1.trim.fq.gz", 
-        trim2="fastp/{sample}_2.trim.fq.gz",
+        trim1="fastp/{sample}.trim.fq.gz", 
         html="fastp/reports/{sample}_fastp.html",
         json="fastp/reports/{sample}_fastp.json"
 
     input:
-        gz1 = "gzips/{sample}_1.fq.gz",
-        gz2 = "gzips/{sample}_2.fq.gz"
+        gz1 = "gzips/{sample}.fq.gz",
     log:
         "logs/{sample}_fastp.log"  
     benchmark:
         "logs/{sample}_fastp.benchmark" 
     shell:
         """
-        fastp -i {input.gz1} -I {input.gz2}  \
-        -o {output.trim1} -O {output.trim2} \
+        fastp -i {input.gz1} \
+        -o {output.trim1} \
         -h {output.html} -j {output.json} > {log}
         """
 
@@ -123,14 +99,11 @@ rule fastp:
 
 rule remove_host:
     output:
-        nohost_R1 = "bbduk/{sample}_1.nohost.fq.gz",
-        nohost_R2 = "bbduk/{sample}_2.nohost.fq.gz",
-        human_R1  = "bbduk/{sample}_1.human.fq.gz",
-        human_R2  = "bbduk/{sample}_2.human.fq.gz"
+        nohost_R1 = "bbduk/{sample}.nohost.fq.gz",
+        human_R1  = "bbduk/{sample}.human.fq.gz",
 
     input:
-        trim1 = "fastp/{sample}_1.trim.fq.gz",
-        trim2 = "fastp/{sample}_2.trim.fq.gz",
+        trim1 = "fastp/{sample}.trim.fq.gz",
         human = "../../../../../../../group/ctbrowngrp/non-microbial-reference/hg19_main_mask_ribo_animal_allplant_allfungus.fa.gz",
 #        human = "../databases/hg19_main_mask_ribo_animal_allplant_allfungus.fa.gz",
 #    threads = 4
@@ -147,9 +120,9 @@ rule remove_host:
     shell:
         """
         bbduk.sh -Xmx64g t=4 \
-        in={input.trim1} in2={input.trim2}\
-        out={output.nohost_R1} out2={output.nohost_R2}\
-        outm={output.human_R1} outm2={output.human_R2}\
+        in={input.trim1}\
+        out={output.nohost_R1}\
+        outm={output.human_R1}\
         k=31 ref={input.human}
         """
 
@@ -157,9 +130,9 @@ rule khmer:
     output:"abundtrim/{sample}.abundtrim.fq.gz"
     input:
         R1="bbduk/{sample}_1.nohost.fq.gz",
-        R2="bbduk/{sample}_2.nohost.fq.gz"
+
     shell:
         """
-        interleave-reads.py {input.R1} {input.R2} | \
+        interleave-reads.py {input.R1} | \
         trim-low-abund.py --gzip -C 3 -Z 18 -M 20e9 -V - -o {output}
         """
