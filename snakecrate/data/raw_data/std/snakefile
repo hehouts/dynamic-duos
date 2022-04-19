@@ -24,7 +24,7 @@
 # ███ set variables ███
 
 #INPUT_DATA = "std_filenames.txt"
-INPUT_DATA = "s5_std_filenames.txt"
+#INPUT_DATA = "s5_std_filenames.txt"
 
 
 #### generate sample list from file,
@@ -32,7 +32,7 @@ INPUT_DATA = "s5_std_filenames.txt"
 FILES = [x.strip().split("\n")[0] for x in open(INPUT_DATA, 'r')]
 SAMPLES = [x.strip().split(".tar")[0] for x in open(INPUT_DATA, 'r')]
 #SAMPLES = [x.strip().split(".fastq.gz")[0] for x in SAMPLES]
-SAMPLES = SAMPLES[:30]
+#SAMPLES = SAMPLES[:30]
 
 #software:
 #snakemake
@@ -48,11 +48,11 @@ SAMPLES = SAMPLES[:30]
 rule all: 
     input: 
 ##   rule untar
-        expand("gzips/{sample}_{ext}.fq.gz",  sample =SAMPLES, ext = [1,2])
+#        expand("gzips/{sample}_{ext}.fq.gz",  sample =SAMPLES, ext = [1,2])
 ##   rule fastp
 #        expand("fastp/{sample}_{ext}.trim.fq.gz", sample =SAMPLES, ext = [1,2])
 ##   rule remove_host 
-#        expand("bbduk/{sample}_{ext}.nohost.fq.gz", sample =SAMPLES, ext = [1,2])
+        expand("bbduk/{sample}_{ext}.nohost.fq.gz", sample =SAMPLES, ext = [1,2])
 ##   rule khmer 
 #        expand("abundtrim/{sample}.abundtrim.fq.gz", sample =SAMPLES)
 
@@ -65,7 +65,7 @@ rule untar:
     #   no input, since the tar files are deleted because they are clogging up my harddrive 
     shell: """
         
-        mkdir {wildcards.sample}/
+        mkdir -p {wildcards.sample}/
         tar xf tars/{wildcards.sample}.tar --directory {wildcards.sample}/
         cd {wildcards.sample}/
 
@@ -82,8 +82,8 @@ rule untar:
             rm *_2_sequence.txt 
 
         else 
-            mv *_R1.fastq.gz ../gzips/{output.F1}
-            mv *_R2.fastq.gz ../gzips/{output.F2}
+            mv *_R1.fastq.gz ../{output.F1}
+            mv *_R2.fastq.gz ../{output.F2}
 
         fi
 

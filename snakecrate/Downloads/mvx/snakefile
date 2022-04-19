@@ -44,7 +44,7 @@ rule all:
 
 # ██████████   RULES  ██████████
 rule download_data:
-    output: "../data/raw_data/vir/tars/{file}"
+    output: "../../data/raw_data/vir/tars/{file}"
     params: 
         URL= lambda wildcards: "https://ibdmdb.org/tunnel/static/HMP2/Viromics/1732/" + wildcards.file
     shell: """
