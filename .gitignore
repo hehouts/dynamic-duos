@@ -26,7 +26,10 @@
 snakecrate/fulldata/*
 intermediate_files/
 
-
+##### grist/sourmash #####
+*.gather.out
+*.gather.csv
+*.prefetch.csv
 
 ##### R #####
 .DS_Store
