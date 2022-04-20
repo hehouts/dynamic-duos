@@ -1,0 +1,72 @@
+prevent_sra_download: true
+samples:
+- CSM67UDR_TR
+- CSM79HLA_TR
+- CSM5MCXD
+- CSM5MCYS
+- CSM67U9J
+- CSM67UA2
+- CSM67UGC
+- CSM79HG5
+- CSM79HGP
+- CSM5MCVL
+- CSM5MCVN
+- CSM67UBF
+- CSM67UBH
+- CSM67UBN
+- CSM67UBR
+- CSM79HJW
+- CSM79HJY
+- CSM5FZ4M
+- CSM5MCWQ
+- CSM67UBX
+- CSM67UBZ
+- CSM67UC6
+- CSM79HLM
+- CSM5MCXH
+- CSM5MCXJ
+- CSM5MCXL
+- CSM5MCXN
+- CSM5MCXP
+- CSM5MCXR
+- CSM67UDF
+- CSM67UDJ
+- CSM67UDN
+- CSM67UDR
+- CSM67UDY
+- CSM79HLA
+- CSM79HLG
+- CSM79HLE
+- CSM79HLC
+- CSM79HLI
+- CSM79HLK
+- CSM5MCY4
+- CSM5MCY8
+- CSM67UE3
+- CSM67UE7
+- CSM67UEA
+- CSM67UEM
+- CSM67UEI
+- CSM79HO1
+
+outdir: outputs.s5_mgx
+# metagenome_trim_memory: (gtdb 1e9?)
+prefetch_memory: 20e9
+
+# for mgx, when looking for bacteria
+#sourmash_databases:
+#- gtdb-rs202.genomic-reps.k31.sbt.zip
+
+### for viromes:
+#sourmash_database_ksize: 21
+#sourmash_scaled: 200
+#sourmash_database_threshold_bp: 100
+
+sourmash_databases:
+- gtdb-rs202.genomic-reps.k31.sbt.zip
+
+#local_databases_info:
+#- /group/ctbrowngrp/scratch/ctbrown/gut-phage-db.grist/GPD_sequences.info.csv
+
+taxonomies:
+- /group/ctbrowngrp/genbank/all_genbank_lineages.20200727.csv

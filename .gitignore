@@ -25,6 +25,8 @@
 
 snakecrate/fulldata/*
 intermediate_files/
+bash_err_*.output
+bash_report_*.output
 
 ##### grist/sourmash #####
 *.gather.out

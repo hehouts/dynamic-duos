@@ -1,1 +1,0 @@
-genome-grist run config-3.yml summarize_gather summarize_mapping --latency-wait 30

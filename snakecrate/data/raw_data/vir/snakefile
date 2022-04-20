@@ -40,7 +40,7 @@ SAMPLES = [x.strip().split(".tar")[0] for x in open(INPUT_DATA, 'r')]
 #bbduk (in bbmap)
 #   conda install -c bioconda bbmap
 # khmer
-#    conda install -y khmer
+#   conda install -y khmer
 
 
 # ██████████ RULE ALL ██████████
@@ -50,11 +50,11 @@ rule all:
 ##   rule untar
 #        expand("gzips/{sample}_{ext}.fq.gz",  sample =SAMPLES, ext = [1,2])
 ##   rule fastp
-        expand("fastp/{sample}_{ext}.trim.fq.gz", sample =SAMPLES, ext = [1,2])
+#        expand("fastp/{sample}_{ext}.trim.fq.gz", sample =SAMPLES, ext = [1,2])
 ##   rule remove_host 
 #        expand("bbduk/{sample}_{ext}.nohost.fq.gz", sample =SAMPLES, ext = [1,2])
 ##   rule khmer 
-#        expand("abundtrim/{sample}.abundtrim.fq.gz", sample =SAMPLES)
+        expand("abundtrim/{sample}.abundtrim.fq.gz", sample =SAMPLES)
 
 # ██████████   RULES  ██████████
 rule untar:
