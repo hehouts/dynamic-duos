@@ -33,6 +33,8 @@ bash_report_*.output
 *.gather.out
 *.gather.csv
 *.prefetch.csv
+*.info.csv
+
 
 ##### R #####
 .DS_Store
