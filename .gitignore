@@ -34,6 +34,7 @@ bash_report_*.output
 *.gather.csv
 *.prefetch.csv
 *.info.csv
+*.bcf
 
 
 ##### R #####
