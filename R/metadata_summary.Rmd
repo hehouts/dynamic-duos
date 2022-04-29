@@ -96,7 +96,7 @@ abx_pair_ids_vec <- ibdmdb %>%
 
 # 838 samples from just the 34 "abxpair" participants,
 abx_pairs_df <- ibdmdb %>% 
-  filter(data_type == "metagenomics" | data_type == "viromics") %>% 
+  filter(data_type == "metagenomics") %>% 
   filter(participant_id %in% abx_pair_ids_vec) %>%
   arrange(participant_id, data_type, week_num)
 #write_csv(abx_pairs_df, "csvs_and_other_metadata/ihmp_metadata_838_antibiotics_paired_mgx_vrx.csv")
