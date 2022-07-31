@@ -1,0 +1,62 @@
+---
+title: "SRA_July_22"
+output: html_document
+date: '2022-07-07'
+---
+
+
+```{r Load-Libraries-and-Data, warning=FALSE}
+library(tidyverse)
+library(janitor)
+library(naniar)
+
+setwd("/Users/hehouts/projects/dynamic-duos/R")
+
+srameta <- clean_names(readr::read_csv("~/Desktop/SraRunTablePRJNA398089.csv"))
+```
+
+
+## conclusions:
+
+We can clearly filter for only WGS, 
+```{r}
+srameta %>% 
+  tabyl(assay_type, organism)
+```
+
+```
+Interesting things:
+  library_name - might have subject & sample id?
+  library_layout - paired or unpaired
+  organism - tells if viral
+  sample name - might have subject & sample id?
+  
+```
+
+So next step should be to get the accession number for the MGX anf VIR samples
+
+```{r}
+sra_MGX_Acc <- srameta %>%
+  filter(assay_type == "WGS" & organism == "human gut metagenome") %>% 
+  select(run)
+sra_MGX_Acc
+
+```
+```{r}
+
+sra_VIR_Acc <- srameta %>%
+  filter(assay_type == "WGS" & organism == "viral metagenome") %>% 
+  select(run)
+sra_VIR_Acc
+```
+
+
+
+```{r}
+sra_mgx_and_vir <- srameta %>%
+  filter(assay_type == "WGS" & organism %in% c("human gut metagenome", "viral metagenome"))%>%   relocate(sample_name, host_subject_id, host_disease, host_sex, host_age, host)
+  
+sra_mgx_and_vir
+```
+So 
+

@@ -5,12 +5,12 @@ output:
     keep_md: yes
 ---
 
+
+#### libraries and setup
+Load libraries
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
-#### libraries
-Load libraries
 ```{r, echo=FALSE, warning=FALSE}
 library(tidyverse)
 library(janitor)
@@ -394,4 +394,9 @@ pair_samples
 write_csv(pair_samples, "paired_mgx_vrx_ihmp_metadata.csv")
 ```
 
+
+```{r}
+pair_samples %>% 
+  filter(external_id == "CSM79HGP")
+```
 
