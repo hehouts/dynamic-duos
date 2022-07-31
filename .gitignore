@@ -35,8 +35,8 @@ bash_report_*.output
 *.prefetch.csv
 *.info.csv
 *.bcf
-*/outputs.*/*
-
+#*/outputs.*/*
+outputs.*/
 ##### R #####
 .DS_Store
 .RData
