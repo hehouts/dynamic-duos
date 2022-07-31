@@ -1,0 +1,17 @@
+512	movefilestr.j48108685.err
+512	movefilestr.j48108769.err
+512	movefilestr.j48108769.out
+512	movefilestr.j48108878.err
+1.5K	du-check
+12K	movefiles_std.sh
+12K	movefilestr.j48108685.out
+12K	movefilestr.j48108878.out
+12K	movefiles_tr.sh
+12K	movefiles_vir.sh
+12K	README.md
+2.4M	metadata
+18M	R
+82M	sandbox
+73G	grist
+253G	2020-work
+1.7T	snakecrate
