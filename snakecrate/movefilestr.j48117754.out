@@ -1,0 +1,22 @@
+Name                : movefilestr
+User                : hehouts
+Account             : ctbrowngrp
+Partition           : bmh
+Nodes               : bm2
+Cores               : 1
+GPUs                : 0
+State               : COMPLETED
+ExitCode            : 0:0
+Submit              : 2022-05-05T15:57:57
+Start               : 2022-05-05T15:57:57
+End                 : 2022-05-05T17:58:41
+Waited              :   00:00:00
+Reserved walltime   : 4-00:00:00
+Used walltime       :   02:00:44
+Used CPU time       :   00:11:19
+% User (Computation):  0.00%
+% System (I/O)      : 99.88%
+Mem reserved        : 2G
+Max Mem used        : 1.71M (bm2)
+Max Disk Write      : 10.24K (bm2)
+Max Disk Read       : 5.35M (bm2)

@@ -1,0 +1,11 @@
+1.0K	subsets_of_data
+12K	Snakefile
+12K	virHMP_env.yml
+25K	archive
+38K	Envs
+343K	logs
+2.0M	CSM5MCVL.tar
+31M	Downloads
+27G	lazysnake
+290G	fulldata
+1.4T	data
