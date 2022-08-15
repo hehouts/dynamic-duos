@@ -33,7 +33,7 @@ Interesting things:
   
 ```
 
-So next step should be to get the accession number for the MGX anf VIR samples
+So next step should be to get the accession number for the MGX and VIR samples
 
 ```{r}
 sra_MGX_Acc <- srameta %>%
@@ -58,5 +58,17 @@ sra_mgx_and_vir <- srameta %>%
   
 sra_mgx_and_vir
 ```
-So 
+
+
+```{r}
+sra_mgx_and_vir %>% 
+  distinct(host_subject_id)
+```
+
+
+```{r}
+sra_mgx_and_vir %>% 
+  filter(host_subject_id == 4024) %>% 
+  reorder(collection_date)
+```
 
