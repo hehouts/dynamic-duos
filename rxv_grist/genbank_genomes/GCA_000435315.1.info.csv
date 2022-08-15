@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_000435315.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/435/315/GCA_000435315.1_MGS162/GCA_000435315.1_MGS162_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/435/315/GCA_000435315.1_MGS162/GCA_000435315.1_MGS162_assembly_report.txt,Bacteroides coprocola CAG:162

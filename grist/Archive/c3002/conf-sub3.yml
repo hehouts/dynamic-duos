@@ -1,9 +1,0 @@
-samples:
-#- SRS2907573
-- SRS2907572
-- SRS2907571
-outdir: outputs.sub3
-metagenome_trim_memory: 1e9
-
-sourmash_databases:
-- gtdb-rs202.genomic-reps.k31.sbt.zip

@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_003470745.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/003/470/745/GCA_003470745.1_ASM347074v1/GCA_003470745.1_ASM347074v1_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/003/470/745/GCA_003470745.1_ASM347074v1/GCA_003470745.1_ASM347074v1_assembly_report.txt,Phocaeicola vulgatus

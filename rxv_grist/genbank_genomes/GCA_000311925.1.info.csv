@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_000311925.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/311/925/GCA_000311925.1_ASM31192v1/GCA_000311925.1_ASM31192v1_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/311/925/GCA_000311925.1_ASM31192v1/GCA_000311925.1_ASM31192v1_assembly_report.txt,Alistipes communis

@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_000433835.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/433/835/GCA_000433835.1_MGS1329/GCA_000433835.1_MGS1329_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/433/835/GCA_000433835.1_MGS1329/GCA_000433835.1_MGS1329_assembly_report.txt,Clostridium bartlettii CAG:1329

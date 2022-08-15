@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_001431025.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/431/025/GCA_001431025.1_VllA_DORA_A_3_16_22_velvet_1.1/GCA_001431025.1_VllA_DORA_A_3_16_22_velvet_1.1_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/431/025/GCA_001431025.1_VllA_DORA_A_3_16_22_velvet_1.1/GCA_001431025.1_VllA_DORA_A_3_16_22_velvet_1.1_assembly_report.txt,Veillonella sp. DORA_A_3_16_22

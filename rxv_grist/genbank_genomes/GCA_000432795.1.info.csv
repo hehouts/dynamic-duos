@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_000432795.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/432/795/GCA_000432795.1_MGS235/GCA_000432795.1_MGS235_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/432/795/GCA_000432795.1_MGS235/GCA_000432795.1_MGS235_assembly_report.txt,Coprobacillus sp. CAG:235

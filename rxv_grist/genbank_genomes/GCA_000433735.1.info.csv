@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_000433735.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/433/735/GCA_000433735.1_MGS167/GCA_000433735.1_MGS167_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/433/735/GCA_000433735.1_MGS167/GCA_000433735.1_MGS167_assembly_report.txt,Clostridium sp. CAG:167

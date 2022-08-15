@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_901669865.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/901/669/865/GCA_901669865.1_cfr5CF_assembly/GCA_901669865.1_cfr5CF_assembly_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/901/669/865/GCA_901669865.1_cfr5CF_assembly/GCA_901669865.1_cfr5CF_assembly_assembly_report.txt,Citrobacter freundii

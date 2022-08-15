@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_000435815.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/435/815/GCA_000435815.1_MGS192/GCA_000435815.1_MGS192_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/435/815/GCA_000435815.1_MGS192/GCA_000435815.1_MGS192_assembly_report.txt,Eubacterium sp. CAG:192

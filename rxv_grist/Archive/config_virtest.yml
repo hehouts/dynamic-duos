@@ -1,0 +1,27 @@
+# data copied from /home/hehouts/dynamic-duos-virome/snakecrate/data/raw_data/vir/abundtrim
+
+prevent_sra_download: true
+samples:
+- SM_6OSOR
+- SM_6UG79
+- SM_6WJN6
+outdir: outputs.virtest
+# metagenome_trim_memory: (gtdb 1e9?)
+prefetch_memory: 20e9
+
+# for mgx, when looking for bacteria
+#sourmash_databases:
+#- gtdb-rs202.genomic-reps.k31.sbt.zip
+
+sourmash_database_ksize: 21
+sourmash_scaled: 200
+sourmash_database_threshold_bp: 100
+
+sourmash_databases:
+- /group/ctbrowngrp/scratch/ctbrown/gut-phage-db.grist/GPD_sequences.zip
+
+local_databases_info:
+- /group/ctbrowngrp/scratch/ctbrown/gut-phage-db.grist/GPD_sequences.info.csv
+
+taxonomies:
+- /group/ctbrowngrp/genbank/all_genbank_lineages.20200727.csv

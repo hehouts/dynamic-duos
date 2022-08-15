@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_000431115.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/431/115/GCA_000431115.1_MGS715/GCA_000431115.1_MGS715_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/431/115/GCA_000431115.1_MGS715/GCA_000431115.1_MGS715_assembly_report.txt,Clostridium sp. CAG:715

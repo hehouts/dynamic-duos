@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_001405535.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/405/535/GCA_001405535.1_13414_6_71/GCA_001405535.1_13414_6_71_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/405/535/GCA_001405535.1_13414_6_71/GCA_001405535.1_13414_6_71_assembly_report.txt,Roseburia inulinivorans

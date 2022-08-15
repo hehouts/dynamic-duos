@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_000433275.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/433/275/GCA_000433275.1_MGS218/GCA_000433275.1_MGS218_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/433/275/GCA_000433275.1_MGS218/GCA_000433275.1_MGS218_assembly_report.txt,Dialister invisus CAG:218

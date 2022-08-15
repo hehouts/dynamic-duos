@@ -17,6 +17,8 @@
 
 
 jobs/
+jobs_vir/
+
 *.html
 *.json
 

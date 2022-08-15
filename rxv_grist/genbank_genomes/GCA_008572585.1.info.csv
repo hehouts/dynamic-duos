@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_008572585.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/008/572/585/GCA_008572585.1_ASM857258v1/GCA_008572585.1_ASM857258v1_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/008/572/585/GCA_008572585.1_ASM857258v1/GCA_008572585.1_ASM857258v1_assembly_report.txt,Bacteroides caccae

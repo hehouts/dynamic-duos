@@ -1,0 +1,53 @@
+#███████╗    ██████╗      █████╗       ███████╗                  
+#██╔════╝    ██╔══██╗    ██╔══██╗      ██╔════╝                  
+#███████╗    ██████╔╝    ███████║      ███████╗                  
+#╚════██║    ██╔══██╗    ██╔══██║       ╚════██║                  
+#███████║    ██║  ██║    ██║  ██║      ███████║                  
+#╚══════╝    ╚═╝  ╚═╝    ╚═╝  ╚═╝      ╚═════╝       
+
+#This acutally uses the SRA accession numbers instead of using local genomes
+
+
+samples:
+- SRR6180319
+- SRR6180320
+- SRR6180321
+- SRR6180322
+- SRR6180323
+- SRR6180324
+- SRR6180325
+- SRR6180326
+
+
+outdir: outputs.vir
+metagenome_trim_memory: 11e9
+prefetch_memory: 11e9
+# ^ 1e9 = 1 gig
+
+# for mgx, when looking for bacteria
+#sourmash_databases:
+#- gtdb-rs202.genomic-reps.k31.sbt.zip
+
+### for viromes:
+#sourmash_database_ksize: 21
+#sourmash_scaled: 200
+#sourmash_database_threshold_bp: 100
+
+sourmash_compute_ksizes:
+- 21
+- 31
+- 51
+
+
+sourmash_databases:
+- /group/ctbrowngrp/scratch/ctbrown/gut-phage-db.grist/GPD_sequences.zip
+#- /group/ctbrowngrp/virus-references/gut-phage-db/GPD_sequences.fa.gz
+
+
+
+sourmash_scaled: 200
+sourmash_database_threshold_bp: 100
+
+taxonomies:
+- /group/ctbrowngrp/genbank/all_genbank_lineages.20200727.csv
+

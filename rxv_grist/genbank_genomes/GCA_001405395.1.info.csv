@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_001405395.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/405/395/GCA_001405395.1_14207_7_1/GCA_001405395.1_14207_7_1_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/405/395/GCA_001405395.1_14207_7_1/GCA_001405395.1_14207_7_1_assembly_report.txt,Lachnospira eligens

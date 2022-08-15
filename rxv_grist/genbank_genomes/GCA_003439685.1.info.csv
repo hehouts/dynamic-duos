@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_003439685.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/003/439/685/GCA_003439685.1_ASM343968v1/GCA_003439685.1_ASM343968v1_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/003/439/685/GCA_003439685.1_ASM343968v1/GCA_003439685.1_ASM343968v1_assembly_report.txt,Bacteroides uniformis

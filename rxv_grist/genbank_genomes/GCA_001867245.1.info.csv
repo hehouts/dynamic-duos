@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_001867245.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/867/245/GCA_001867245.1_ASM186724v1/GCA_001867245.1_ASM186724v1_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/867/245/GCA_001867245.1_ASM186724v1/GCA_001867245.1_ASM186724v1_assembly_report.txt,Streptococcus thermophilus

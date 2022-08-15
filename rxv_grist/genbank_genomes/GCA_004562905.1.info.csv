@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_004562905.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/004/562/905/GCA_004562905.1_ASM456290v1/GCA_004562905.1_ASM456290v1_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/004/562/905/GCA_004562905.1_ASM456290v1/GCA_004562905.1_ASM456290v1_assembly_report.txt,bacterium

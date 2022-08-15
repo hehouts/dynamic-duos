@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_000724815.2,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/724/815/GCA_000724815.2_ASM72481v2/GCA_000724815.2_ASM72481v2_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/724/815/GCA_000724815.2_ASM72481v2/GCA_000724815.2_ASM72481v2_assembly_report.txt,Bacteroides fragilis

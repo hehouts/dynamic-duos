@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_002865385.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/865/385/GCA_002865385.1_ASM286538v1/GCA_002865385.1_ASM286538v1_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/002/865/385/GCA_002865385.1_ASM286538v1/GCA_002865385.1_ASM286538v1_assembly_report.txt,[Ruminococcus] gnavus

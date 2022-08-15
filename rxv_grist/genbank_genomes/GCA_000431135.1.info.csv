@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_000431135.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/431/135/GCA_000431135.1_MGS590/GCA_000431135.1_MGS590_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/431/135/GCA_000431135.1_MGS590/GCA_000431135.1_MGS590_assembly_report.txt,Clostridium sp. CAG:590

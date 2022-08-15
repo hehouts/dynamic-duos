@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_000431575.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/431/575/GCA_000431575.1_MGS83/GCA_000431575.1_MGS83_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/431/575/GCA_000431575.1_MGS83/GCA_000431575.1_MGS83_assembly_report.txt,Firmicutes bacterium CAG:83

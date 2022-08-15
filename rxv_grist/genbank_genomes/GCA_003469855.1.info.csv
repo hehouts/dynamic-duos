@@ -1,0 +1,2 @@
+acc,genome_url,assembly_report_url,ncbi_tax_name
+GCA_003469855.1,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/003/469/855/GCA_003469855.1_ASM346985v1/GCA_003469855.1_ASM346985v1_genomic.fna.gz,https://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/003/469/855/GCA_003469855.1_ASM346985v1/GCA_003469855.1_ASM346985v1_assembly_report.txt,Bacteroides stercoris
